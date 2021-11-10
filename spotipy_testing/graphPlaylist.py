@@ -35,7 +35,7 @@ def get_x_y_z(song_list_ids, varw, varx, vary, varz):
     # Get features for each song in list
     features = sp.audio_features(song_list_ids)
 
-    print(features[0])
+    # print(features[0])
     w = get_attribute(features, varw)
     y = get_attribute(features, vary)
     x = get_attribute(features, varx)
@@ -44,19 +44,17 @@ def get_x_y_z(song_list_ids, varw, varx, vary, varz):
     return w, x, y, z
 
 
-def show_graph(varw, varx, vary, varz):
+def show_graph_sample(varx, vary, varz, x1, x2, x3, y1, y2, y3, z1, z2, z3):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    # img = ax.scatter(x1, y1, z1, c=w1, cmap=plt.hot(), marker=",")
-    img = ax.scatter(x2, y2, z2, c=w2, cmap=plt.hot(), marker="v")
-    # img = ax.scatter(x3, y3, z3, c=w3, cmap=plt.hot(), marker="o")
+    ax.scatter(x1, y1, z1, c='y', marker='o')
+    ax.scatter(x2, y2, z2, c='b', marker='o')
+    ax.scatter(x3, y3, z3, c='r', marker='o')
 
     ax.set_xlabel(varx)
     ax.set_ylabel(vary)
     ax.set_zlabel(varz)
-
-    fig.colorbar(img)
 
     plt.show()
 
@@ -97,6 +95,7 @@ def graph_two_playlist(varx, vary, varz, w1, x1, y1, z1, w2, x2, y2, z2):
 
     plt.show()
 
+
 # Define the 3 variables
 # varx = 'valence'
 # vary = 'energy'
@@ -122,8 +121,10 @@ def main():
 
     w1, x1, y1, z1 = get_x_y_z(get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo'), vw, vx, vy, vz)
     w2, x2, y2, z2 = get_x_y_z(get_song_list_ids('78FHjijA1gBLuVx4qmcHq6'), vw, vx, vy, vz)
-    # x3, y3, z3 = get_x_y_z(spotipyDocCode.get_recently_played())
-
     w3, x3, y3, z3 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'), vw, vx, vy, vz)
+    # w3, x3, y3, z3 = get_x_y_z(spotipyDocCode.get_recently_played())
 
-    show_graph(vw, vx, vy, vz)
+    show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+
+
+print("Running")

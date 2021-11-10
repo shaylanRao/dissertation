@@ -1,16 +1,17 @@
-import tweepy_testing
+import tweepy
 
-consumer_key = 'change with your consumer key'
-consumer_secret = 'change with your consumer secret'
-access_token = 'change with your access token'
-access_secret = 'change with your access secret'
+consumer_key = 'UufJ607HmfImJ0lP8aRq5mfsE'
+consumer_secret = 'dsERJyMw0x5B5bbjo7XlcMhUWuMdd5BI884NlZA747Kg5wMUzv'
+access_token = '1450235258784337923-LPGZuv1f6UVZ61c1huzFz66OjIV0yL'
+access_secret = 'qnYQotg4V6veml9nvAtrDcNgk5vtd6RrQU1soZWxt69y6'
+
 tweetsPerQry = 100
 maxTweets = 1000000
 hashtag = "#mencatatindonesia"
 
-authentication = tweepy_testing.OAuthHandler(consumer_key, consumer_secret)
+authentication = tweepy.OAuthHandler(consumer_key, consumer_secret)
 authentication.set_access_token(access_token, access_secret)
-api = tweepy_testing.API(authentication, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+api = tweepy.API(authentication, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 maxId = -1
 tweetCount = 0
 while tweetCount < maxTweets:
