@@ -9,7 +9,7 @@ from IPython.display import display
 
 api = innit_tweepy.getTweepyApi()
 
-choice = "open.spotify.com lang:en exclude:replies -filter:retweets"
+choice = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets'
 
 song_list = []
 user_screen_name_list = []
@@ -51,7 +51,7 @@ def get_all_users_tweets():
         user_tweets = api.user_timeline(screen_name=userID,
                                         count=20,
                                         include_rts=False,
-                                        exclude_replies=True,
+                                        exclude_replies=False,
                                         tweet_mode='extended'
                                         )
         data = np.array([["", "", "", ""]])
