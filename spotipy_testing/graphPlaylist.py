@@ -59,19 +59,27 @@ def show_graph_sample(varx, vary, varz, x1, x2, x3, y1, y2, y3, z1, z2, z3):
     plt.show()
 
 
-def graph_one_playlist(varx, vary, varz, w, x, y, z):
+def graph_one_playlist(song_list_graph_one):
+    vw = 'acousticness'
+    vx = 'valence'
+    vy = 'energy'
+    vz = 'speechiness'
+
+    w, x, y, z = get_x_y_z(song_list_graph_one, vw, vx, vy, vz)
     fig1 = plt.figure()
-    ax = fig1.add_subplot(projection='3d')
 
-    # img = ax.scatter(x1, y1, z1, c=w1, cmap=plt.hot(), marker=",")
-    img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker="v")
-    # img = ax.scatter(x3, y3, z3, c=w3, cmap=plt.hot(), marker="o")
+    ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
 
-    ax.set_xlabel(varx)
-    ax.set_ylabel(vary)
-    ax.set_zlabel(varz)
-
+    # 4-dimensions
+    img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker=".")
     fig1.colorbar(img)
+
+    # 3-dimensions
+    # img = ax.scatter(x, y, z, marker=".")
+
+    ax.set_xlabel(vx)
+    ax.set_ylabel(vy)
+    ax.set_zlabel(vz)
 
     plt.show()
 
@@ -113,18 +121,23 @@ def graph_two_playlist(varx, vary, varz, w1, x1, y1, z1, w2, x2, y2, z2):
 
 # -----------------------------------------------------------------------------
 
+
 def main():
-    vw = 'acousticness'
-    vx = 'valence'
-    vy = 'energy'
-    vz = 'speechiness'
+    # w2, x2, y2, z2 = get_x_y_z(get_song_list_ids('78FHjijA1gBLuVx4qmcHq6'), vw, vx, vy, vz)
+    # w3, x3, y3, z3 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'), vw, vx, vy, vz)
+    # w3, x3, y3, z3 = get_x_y_z(recentlyPlayed.get_recently_played())
 
-    w1, x1, y1, z1 = get_x_y_z(get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo'), vw, vx, vy, vz)
-    w2, x2, y2, z2 = get_x_y_z(get_song_list_ids('78FHjijA1gBLuVx4qmcHq6'), vw, vx, vy, vz)
-    w3, x3, y3, z3 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'), vw, vx, vy, vz)
-    # w3, x3, y3, z3 = get_x_y_z(spotipyDocCode.get_recently_played())
+    # w1, x1, y1, z1 = get_x_y_z(get_song_list_ids('4ghvB1pIW4LTUn0RYrfuD5'), vw, vx, vy, vz)
+    # graph_one_playlist(get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo'))
 
-    show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+    graph_one_playlist(get_song_list_ids('78FHjijA1gBLuVx4qmcHq6'))
+
+    graph_one_playlist(get_song_list_ids('3tpc6g7KWkUF5TVt0zT8q6'))
 
 
-print("Running")
+    # w1, x1, y1, z1 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'), vw, vx, vy, vz)
+    # graph_one_playlist(vx, vy, vz, w1, x1, y1, z1)
+    # show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
+
+
+main()
