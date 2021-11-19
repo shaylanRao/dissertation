@@ -23,7 +23,7 @@ sample_text = "'Team, I know that times are tough! Product '\
 column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
 
 
-def analyse(text):
+def get_senti(text):
     response = tone_analyzer.tone({'text': text},
                                   sentences=True
                                   ).get_result()
@@ -42,9 +42,11 @@ def array_maker(json_output):
     return array
 
 
-json_values = (analyse(format_for_analysis(sample_text)))
-# print(array_maker(json_values))
-main_df = pd.DataFrame(columns=column_names)
-df2 = {'anger': '0.3242', 'sadness': '0.8864', 'analytical': '0.0234'}
-main_df = main_df.append(df2, ignore_index=True)
-display(main_df)
+def main():
+    json_values = (get_senti(format_for_analysis(sample_text)))
+    # print(array_maker(json_values))
+    main_df = pd.DataFrame(columns=column_names)
+    df2 = {'anger': '0.3242', 'sadness': '0.8864', 'analytical': '0.0234'}
+    display(main_df)
+    main_df = main_df.append(df2, ignore_index=True)
+

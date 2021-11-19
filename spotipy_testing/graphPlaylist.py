@@ -134,7 +134,6 @@ def main():
 
     graph_one_playlist(get_song_list_ids('3tpc6g7KWkUF5TVt0zT8q6'))
 
-
     # w1, x1, y1, z1 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'), vw, vx, vy, vz)
     # graph_one_playlist(vx, vy, vz, w1, x1, y1, z1)
     # show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
