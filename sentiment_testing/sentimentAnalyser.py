@@ -25,7 +25,7 @@ column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "t
 
 def get_senti(text):
     response = tone_analyzer.tone({'text': text},
-                                  sentences=True
+                                  sentences=False
                                   ).get_result()
     return response
 
