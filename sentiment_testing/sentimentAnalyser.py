@@ -1,4 +1,5 @@
 import json
+
 import numpy as np
 import pandas as pd
 
@@ -24,10 +25,25 @@ column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "t
 
 
 def get_senti(text):
+    if text == "":
+        return None
     response = tone_analyzer.tone({'text': text},
-                                  sentences=False
+                                  sentences=True
                                   ).get_result()
-    return response
+    try:
+        analysis = response['sentences_tone'][0]['tones']
+        if analysis:
+            for item in analysis:
+                print(item)
+        else:
+            return "No Tone"
+    # only one sentence (the next tweet is a song)
+    except KeyError:
+        try:
+            return response['document_tone']['tones'][0]
+        except IndexError:
+            return "Gibberish"
+    return "---------------"
 
 
 def format_for_analysis(raw_text):
@@ -42,6 +58,19 @@ def array_maker(json_output):
     return array
 
 
+def gain_tone_values(text):
+    if text == "":
+        return None
+    else:
+        try:
+            senti_json = get_senti(text)
+            document_tone = senti_json['document_tone']['tones'][0]
+            # print(document_tone['tone_id'])
+            print(senti_json[0])
+        except IndexError:
+            print("No tone")
+
+
 def main():
     json_values = (get_senti(format_for_analysis(sample_text)))
     # print(array_maker(json_values))
@@ -50,3 +79,7 @@ def main():
     display(main_df)
     main_df = main_df.append(df2, ignore_index=True)
 
+
+# test_text = "I am so happy, i am scared"
+# print(test_text)
+# gain_tone_values(test_text)

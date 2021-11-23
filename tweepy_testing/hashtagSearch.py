@@ -152,7 +152,6 @@ def get_before_s_tweets():
         messages = ""
 
         print("Track ID: ", s_tweet[1][2])
-        print("Tweet ID: ", s_tweet[1][3])
 
         # Query for tweets from user
         query = 'lang:en exclude:replies -filter:retweets ' + example_user['user_name']
@@ -167,18 +166,13 @@ def get_before_s_tweets():
         for tweet in before_s_tweet:
             if tweet.id != tweet_id:
                 if song_id_in_url(tweet.entities["urls"]) == "":
-                    print("TEXT:  ", clean_text(tweet.text))
                     messages = '\n'.join([messages, clean_text(tweet.text)])
                     # print("SENTI: ", get_senti(clean_text(tweet.text)))
-                    print("")
                 else:
                     break
             else:
-                print("FIRST TWEET")
-                print("FIRST TEXT:  ", clean_text(tweet.text))
                 messages = '\n'.join([messages, clean_text(tweet.text)])
                 # print("FIRST SENTI: ", get_senti(clean_text(tweet.text)))
-                print("")
 
         print(get_senti(messages))
 
