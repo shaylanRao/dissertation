@@ -16,40 +16,49 @@ tone_analyzer = ToneAnalyzerV3(
 tone_analyzer.set_service_url(
     'https://api.eu-gb.tone-analyzer.watson.cloud.ibm.com/instances/54ddd4d4-1449-40a7-8c05-fb9494afa611')
 
-sample_text = "'Team, I know that times are tough! Product '\
+sample_text_old = "'Team, I know that times are tough! Product '\
     'sales have been disappointing for the past three '\
     'quarters. We have a competitive product, but we '\
     'need to do a better job of selling it!'"
+
+sample_text = "Donda is a work of art \n They said I was mad at the Grammys BUT IM LOOKING AT MY GRAMMY RN \n This isnt enough I need 4K"
 
 column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
 
 
 def get_senti(text):
+    main_df = pd.DataFrame(columns=column_names)
+    # if parameter us empty
     if text == "":
         return None
+    # Analyse the text (all sentences)
     response = tone_analyzer.tone({'text': text},
                                   sentences=True
                                   ).get_result()
+    # get tones for each sentence (if multiple sentences)
     try:
-        analysis = response['sentences_tone'][0]['tones']
-        if analysis:
-            for item in analysis:
-                print(item)
-        else:
-            return "No Tone"
+        analysis = response['sentences_tone']
+        print("MULTIPLE SENTENCES")
+        for item in analysis:
+            df2 = sentence_analyser(item['tones'])
+            main_df = main_df.append(df2, ignore_index=True)                # append tone values to total dataframe
     # only one sentence (the next tweet is a song)
     except KeyError:
+        # Returns the sentiment score value for the single sentence
         try:
-            return response['document_tone']['tones'][0]
+            print("ONE SENTENCE")
+            print(response['document_tone']['tones'])
+            df = sentence_analyser(response['document_tone']['tones'])
+            main_df = main_df.append(df, ignore_index=True)
+            return main_df.fillna(0).mean()
+        # No tone identified
         except IndexError:
             return "Gibberish"
-    return "---------------"
+    # return dataframe from multiple sentences
+    return main_df.fillna(0).mean()
 
 
-def format_for_analysis(raw_text):
-    return raw_text
-
-
+#
 def array_maker(json_output):
     main_df = pd.DataFrame(columns=column_names)
     array = np.array("")
@@ -58,28 +67,33 @@ def array_maker(json_output):
     return array
 
 
-def gain_tone_values(text):
-    if text == "":
+def sentence_analyser(item):
+    if not item:
         return None
-    else:
-        try:
-            senti_json = get_senti(text)
-            document_tone = senti_json['document_tone']['tones'][0]
-            # print(document_tone['tone_id'])
-            print(senti_json[0])
-        except IndexError:
-            print("No tone")
+    # For each type of tone in a sentece (usually just one)
+    tone_id_list = []
+    tone_value = []
+    for aspect in item:
+        tone_id_list.append(aspect['tone_id'])
+        tone_value.append(aspect['score'])
+
+    df2 = dict(zip(tone_id_list, tone_value))
+    return df2
 
 
 def main():
-    json_values = (get_senti(format_for_analysis(sample_text)))
-    # print(array_maker(json_values))
+    # json_values = (get_senti(sample_text))
+    data = []
     main_df = pd.DataFrame(columns=column_names)
     df2 = {'anger': '0.3242', 'sadness': '0.8864', 'analytical': '0.0234'}
-    display(main_df)
     main_df = main_df.append(df2, ignore_index=True)
 
+    name = ['fear', 'sadness', 'joy']
+    values = ['0.232', '0.342', '0.435']
+    df2 = dict(zip(name, values))
+    # df2 = {name[0]: '0.453', 'sadness': '0.233', 'joy': '0.324'}
+    main_df = main_df.append(df2, ignore_index=True)
+    display(main_df)
 
-# test_text = "I am so happy, i am scared"
-# print(test_text)
-# gain_tone_values(test_text)
+
+# main()
