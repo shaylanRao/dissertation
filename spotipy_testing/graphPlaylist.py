@@ -2,7 +2,6 @@ import spotipy
 from cffi.backend_ctypes import xrange
 from spotipy.oauth2 import SpotifyOAuth
 import datetime
-import recentlyPlayed
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -60,27 +59,32 @@ def show_graph_sample(varx, vary, varz, x1, x2, x3, y1, y2, y3, z1, z2, z3):
 
 
 def graph_one_playlist(song_list_graph_one):
+    print("GRAPH 1: ", song_list_graph_one)
     vw = 'acousticness'
     vx = 'valence'
     vy = 'energy'
     vz = 'speechiness'
 
     w, x, y, z = get_x_y_z(song_list_graph_one, vw, vx, vy, vz)
+    print("w: ", w)
+    print("x: ", x)
+    print("y: ", y)
+    print("z: ", z)
     fig1 = plt.figure()
 
     ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
 
     # 4-dimensions
-    img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker=".")
-    fig1.colorbar(img)
+    # img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker=".")
+    # fig1.colorbar(img)
 
     # 3-dimensions
-    # img = ax.scatter(x, y, z, marker=".")
+    img = ax.scatter(x, y, z, marker=".")
 
     ax.set_xlabel(vx)
     ax.set_ylabel(vy)
     ax.set_zlabel(vz)
-
+    print("FIGNUMS:", plt.get_fignums())
     plt.show()
 
 
@@ -139,4 +143,4 @@ def main():
     # show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
 
 
-main()
+# main()

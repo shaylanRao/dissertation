@@ -10,11 +10,11 @@ import numpy as np
 from IPython.display import display
 
 from sentiment_testing.sentimentAnalyser import get_senti
+from spotipy_testing.graphPlaylist import graph_one_playlist
 
 api = innit_tweepy.getTweepyApi()
 
 choice = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets'
-
 song_list = []
 user_screen_name_list = []
 all_tweets = []
@@ -22,14 +22,12 @@ all_tweets = []
 column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
 all_s_tweets = pd.DataFrame(columns=column_names)
 
+num_users = 5
+num_songs = 7
+num_before_tweets = 3
+
 # Gets recent tweets which include spotify links,  .items(n) -> how many different users will be searched
-recent_s_tweets = tweepy.Cursor(api.search_tweets, q=choice, result_type='recent').items(5)
-
-
-# Created a list of songs for a given user using the s_tweets dataframe
-def get_twitter_song_list():
-    # TODO
-    return song_list
+recent_s_tweets = tweepy.Cursor(api.search_tweets, q=choice, result_type='recent').items(num_users)
 
 
 def song_id_in_url(urls):
@@ -54,7 +52,8 @@ def get_user_list():
 # Gets only spotify tweets from a user - passed as string
 def get_users_spotify_tweets(screen_name):
     query = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets' + " " + screen_name
-    spotify_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(10)
+    # Gets specified number of tweets that include songs in the tweets
+    spotify_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(num_songs)
     return spotify_tweets
 
 
@@ -132,10 +131,18 @@ def tabulate_s_tweets(user_name, text, track_id, tweet_id, time):
 
 
 def create_song_lists():
+    all_user_lists = []
     # iterates through each user within s_tweets
-    # for user in all_s_tweets['user_name'].unique():
-    #     print(user)
-    return None
+    for user in all_s_tweets['user_name'].unique():
+        user_song_list = []
+        for row in all_s_tweets[all_s_tweets['user_name'] == user].iterrows():
+            # Gets track ID from tweet
+            if row[1][2] != "":
+                user_song_list.append(row[1][2])
+
+        if user_song_list:
+            all_user_lists.append(user_song_list)
+    return all_user_lists
 
 
 def get_before_s_tweets():
@@ -162,7 +169,7 @@ def get_before_s_tweets():
                                        result_type='recent',
                                        max_id=tweet_id,
                                        until=until_date
-                                       ).items(3)
+                                       ).items(num_before_tweets)
         for tweet in before_s_tweet:
             if tweet.id != tweet_id:
                 if song_id_in_url(tweet.entities["urls"]) == "":
@@ -174,6 +181,7 @@ def get_before_s_tweets():
                 messages = '\n'.join([messages, clean_text(tweet.text)])
                 # print("FIRST SENTI: ", get_senti(clean_text(tweet.text)))
 
+        # Gets overall sentiment from pas tweets (song  relevant)
         print(get_senti(messages))
 
 
@@ -184,7 +192,7 @@ def _main_():
         # for some reason can't store this and use it in multiple functions/conditionals
         #     s_tweets = get_users_spotify_tweets(user)
 
-        # If there are more than 2 tweets that the user has made which includes a spotify track, then
+        # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS WITH LESS - hence not always selected number of users shown in table
         if count_iterable(get_users_spotify_tweets(user)) > 2:
 
             # For each tweet, extract each component and collate it in a dataframe
@@ -195,11 +203,14 @@ def _main_():
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
-    # Gets a couple of previous tweets from a user before they posted a specific song
-    get_before_s_tweets()
-
     # Saves the tweets related to a track as a csv file [user id, text, track (if there), time]
-    # all_s_tweets.to_csv("s_tweets_trial.csv")
+    all_s_tweets.to_csv("s_tweets_trial.csv")
+
+    # Gets a couple of previous tweets from a user before they posted a specific song
+    # get_before_s_tweets()
+    test_list = create_song_lists()[0]
+    print(test_list)
+    graph_one_playlist(test_list)
 
     # Outdated
     # Gets all tweets from a user

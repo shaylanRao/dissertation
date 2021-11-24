@@ -46,8 +46,6 @@ def get_senti(text):
     except KeyError:
         # Returns the sentiment score value for the single sentence
         try:
-            print("ONE SENTENCE")
-            print(response['document_tone']['tones'])
             df = sentence_analyser(response['document_tone']['tones'])
             main_df = main_df.append(df, ignore_index=True)
             return main_df.fillna(0).mean()
