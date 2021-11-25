@@ -22,8 +22,8 @@ all_tweets = []
 column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
 all_s_tweets = pd.DataFrame(columns=column_names)
 
-num_users = 5
-num_songs = 7
+num_users = 10
+max_song_tweets = 20
 num_before_tweets = 3
 
 # Gets recent tweets which include spotify links,  .items(n) -> how many different users will be searched
@@ -53,7 +53,7 @@ def get_user_list():
 def get_users_spotify_tweets(screen_name):
     query = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets' + " " + screen_name
     # Gets specified number of tweets that include songs in the tweets
-    spotify_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(num_songs)
+    spotify_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(max_song_tweets)
     return spotify_tweets
 
 
@@ -208,9 +208,16 @@ def _main_():
 
     # Gets a couple of previous tweets from a user before they posted a specific song
     # get_before_s_tweets()
-    test_list = create_song_lists()[0]
-    print(test_list)
-    graph_one_playlist(test_list)
+
+    # Gets a list of songs
+    all_song_lists = create_song_lists()
+
+    # Gets the largest list of songs
+    max_list = max(x for x in all_song_lists)
+    print(all_song_lists)
+
+    # Graphs the largest song list
+    graph_one_playlist(max_list)
 
     # Outdated
     # Gets all tweets from a user

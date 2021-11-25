@@ -75,16 +75,15 @@ def graph_one_playlist(song_list_graph_one):
     ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
 
     # 4-dimensions
-    # img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker=".")
-    # fig1.colorbar(img)
+    img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), marker=".")
+    fig1.colorbar(img)
 
     # 3-dimensions
-    img = ax.scatter(x, y, z, marker=".")
+    # img = ax.scatter(x, y, z, marker=".")
 
     ax.set_xlabel(vx)
     ax.set_ylabel(vy)
     ax.set_zlabel(vz)
-    print("FIGNUMS:", plt.get_fignums())
     plt.show()
 
 
