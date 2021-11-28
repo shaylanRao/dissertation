@@ -22,9 +22,12 @@ all_tweets = []
 column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
 all_s_tweets = pd.DataFrame(columns=column_names)
 
+black_list = ['BBCR6MusicBot', 'KiddysplaceMx']
+
 num_users = 10
 max_song_tweets = 20
 num_before_tweets = 3
+s_tweet_minimum = 6
 
 # Gets recent tweets which include spotify links,  .items(n) -> how many different users will be searched
 recent_s_tweets = tweepy.Cursor(api.search_tweets, q=choice, result_type='recent').items(num_users)
@@ -185,15 +188,26 @@ def get_before_s_tweets():
         print(get_senti(messages))
 
 
+# Remove any blacklisted accounts
+def rem_blacklist():
+    for user_name in black_list:
+        try:
+            user_screen_name_list.remove(user_name)
+        except ValueError:
+            pass
+
+
 def _main_():
     # Creates list of users who have posted using a spotify link in their tweet
     get_user_list()
+    rem_blacklist()
     for user in user_screen_name_list:
         # for some reason can't store this and use it in multiple functions/conditionals
         #     s_tweets = get_users_spotify_tweets(user)
 
-        # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS WITH LESS - hence not always selected number of users shown in table
-        if count_iterable(get_users_spotify_tweets(user)) > 2:
+        # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS
+        # WITH LESS - hence not always selected number of users shown in table
+        if count_iterable(get_users_spotify_tweets(user)) > s_tweet_minimum:
 
             # For each tweet, extract each component and collate it in a dataframe
             for tweet in get_users_spotify_tweets(user):
