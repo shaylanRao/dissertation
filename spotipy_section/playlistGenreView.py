@@ -1,5 +1,5 @@
 import graphPlaylist
-from tweepy_testing import hashtagSearch
+from tweepy import hashtagSearch
 
 vw = 'acousticness'
 vx = 'valence'

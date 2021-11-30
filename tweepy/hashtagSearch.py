@@ -9,8 +9,8 @@ import pandas as pd
 import numpy as np
 from IPython.display import display
 
-from sentiment_testing.sentimentAnalyser import get_senti
-from spotipy_testing.graphPlaylist import graph_one_playlist
+from sentiment.sentimentAnalyser import get_senti
+from spotipy_section.graphPlaylist import graph_one_playlist
 
 api = innit_tweepy.getTweepyApi()
 
@@ -22,7 +22,10 @@ all_tweets = []
 column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
 all_s_tweets = pd.DataFrame(columns=column_names)
 
-black_list = ['BBCR6MusicBot', 'KiddysplaceMx']
+label_df = pd.DataFrame()
+
+black_list = ['BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777', 'bieberonspotify',
+              'LiveMixPlay', 'CAA_Official', 'fabclaxton', 'THXJRT', 'moevazquez']
 
 num_users = 10
 max_song_tweets = 20
@@ -33,6 +36,7 @@ s_tweet_minimum = 6
 recent_s_tweets = tweepy.Cursor(api.search_tweets, q=choice, result_type='recent').items(num_users)
 
 
+# Gets the Spotify song id
 def song_id_in_url(urls):
     try:
         url = urls[0]['expanded_url']
@@ -60,40 +64,6 @@ def get_users_spotify_tweets(screen_name):
     return spotify_tweets
 
 
-# Not in use!
-def get_all_users_tweets():
-    main_df = pd.DataFrame(np.array([["", "", "", ""]]))
-    for userID in user_screen_name_list:
-        # Gets the timeline of tweets from each user
-        query = 'lang:en exclude:replies -filter:retweets' + " " + userID
-        user_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(10)
-
-        user_tweets = api.user_timeline(screen_name=userID,
-                                        count=20,
-                                        include_rts=False,
-                                        exclude_replies=False,
-                                        tweet_mode='extended'
-                                        )
-        data = np.array([["", "", "", ""]])
-        for tweet in user_tweets:
-            # Cleans the text from the tweet
-            tweet_text = clean_text(tweet.full_text)
-
-            # Gets the song id from the URL if the URL is set to a spotify track
-            urls = tweet.entities["urls"]
-            song_url = song_id_in_url(urls)
-
-            # Appends the tweet data to past data (from same user)
-            data = np.append(data, [[userID, tweet_text, song_url, tweet.created_at]], axis=0)
-
-        # Converts the array into a dataframe
-        main_df = main_df.append(pd.DataFrame(data))
-
-    # Creates csv of dataset
-    main_df.to_csv("Dataset_moodify_trials.csv")
-    display(main_df)
-
-
 # Cleans text data - passed as string
 def clean_text(message):
     # Removes space, flattens text
@@ -107,6 +77,7 @@ def clean_text(message):
     return tweet_text
 
 
+# Gets tweet message and song url (if there is one)
 def get_s_tweet_data(tweet):
     tweet_text = clean_text(tweet.text)
     urls = tweet.entities["urls"]
@@ -114,6 +85,7 @@ def get_s_tweet_data(tweet):
     return tweet_text, song_url
 
 
+# Gets the size of how many tweets are in the search
 def get_size_of_search(tweet_search_items):
     counter = 0
     for i in tweet_search_items:
@@ -122,10 +94,12 @@ def get_size_of_search(tweet_search_items):
     return counter
 
 
+# Function for counting number of elements
 def count_iterable(i):
     return sum(1 for e in i)
 
 
+# Puts passed data into dataframe
 def tabulate_s_tweets(user_name, text, track_id, tweet_id, time):
     df = {'user_name': user_name, 'text': text, 'track_id': track_id, 'tweet_id': tweet_id, 'time': time}
     global all_s_tweets
@@ -133,6 +107,7 @@ def tabulate_s_tweets(user_name, text, track_id, tweet_id, time):
     return None
 
 
+# Creates a song list for each user from the dataframe (all_s_tweets)
 def create_song_lists():
     all_user_lists = []
     # iterates through each user within s_tweets
@@ -148,44 +123,68 @@ def create_song_lists():
     return all_user_lists
 
 
+# TODO appending dataframe of labels to each song
+def add_song_label(messages):
+    global label_df
+    label = get_senti(messages)
+    print("Label:")
+    display(label)
+    print("-------------------------")
+    df = pd.DataFrame({label})
+    df.transpose()
+    display(df)
+    label_df.append(df)
+    label_df = label_df.append(df)
+
+
 def get_before_s_tweets():
-    example_user = all_s_tweets.iloc[0]
-    print("user_name:   ", example_user['user_name'])
+    # example_user = all_s_tweets.iloc[0]
+    # print("user_name:   ", example_user['user_name'])
+    count = 0
 
-    for s_tweet in all_s_tweets[all_s_tweets['user_name'] == example_user['user_name']].iterrows():
-        # Gets date (YYY-MM-DD) of tweet - use to limit tweets only going back 7 days - only to keep tweets within bound
-        until_date = example_user['time'].date()
-        until_date += timedelta(days=1)
+    # For each user in the dataframe
+    for user in all_s_tweets['user_name'].unique():
+        print(user, ": ")
+        # For each spotify tweet that user has made
+        for s_tweet in all_s_tweets[all_s_tweets['user_name'] == user].iterrows():
+            messages = ""
 
-        # Gets tweet_id
-        tweet_id = s_tweet[1][3]
-        messages = ""
+            # Gets date (YYY-MM-DD) of tweet - use to limit tweets only going back 7 days - only to keep tweets
+            # within bound
+            until_date = s_tweet[1][4].date()
 
-        print("Track ID: ", s_tweet[1][2])
+            # Increments 1 to account for the current tweet
+            until_date += timedelta(days=1)
 
-        # Query for tweets from user
-        query = 'lang:en exclude:replies -filter:retweets ' + example_user['user_name']
+            # Gets tweet_id
+            tweet_id = s_tweet[1][3]
 
-        # Gets (upto) 3 tweets from user - until: searches tweets BEFORE given date
-        before_s_tweet = tweepy.Cursor(api.search_tweets,
-                                       q=query,
-                                       result_type='recent',
-                                       max_id=tweet_id,
-                                       until=until_date
-                                       ).items(num_before_tweets)
-        for tweet in before_s_tweet:
-            if tweet.id != tweet_id:
-                if song_id_in_url(tweet.entities["urls"]) == "":
-                    messages = '\n'.join([messages, clean_text(tweet.text)])
-                    # print("SENTI: ", get_senti(clean_text(tweet.text)))
+            # Query for tweets from user
+            query = 'lang:en exclude:replies -filter:retweets ' + user
+
+            # Gets (upto number declared) tweets from user - until: searches tweets BEFORE given date
+            before_s_tweet = tweepy.Cursor(api.search_tweets,
+                                           q=query,
+                                           result_type='recent',
+                                           max_id=tweet_id,
+                                           until=until_date
+                                           ).items(num_before_tweets)
+            for tweet in before_s_tweet:
+                # If the tweet is not the spotify tweet
+                if tweet.id != tweet_id:
+                    # And does not have any other spotify song associated with it
+                    if song_id_in_url(tweet.entities["urls"]) == "":
+                        messages = '\n'.join([messages, clean_text(tweet.text)])
+                    else:
+                        # Go to next tweet
+                        break
                 else:
-                    break
-            else:
-                messages = '\n'.join([messages, clean_text(tweet.text)])
-                # print("FIRST SENTI: ", get_senti(clean_text(tweet.text)))
+                    messages = '\n'.join([messages, clean_text(tweet.text)])
 
-        # Gets overall sentiment from pas tweets (song  relevant)
-        print(get_senti(messages))
+            # Gets overall sentiment from past tweets together (rounded sentiment leading upto song)
+            #     Acts as label for song
+            # print(get_senti(messages))
+            add_song_label(messages)
 
 
 # Remove any blacklisted accounts
@@ -197,14 +196,13 @@ def rem_blacklist():
             pass
 
 
-def _main_():
+def create_all_s_tweets():
     # Creates list of users who have posted using a spotify link in their tweet
     get_user_list()
+
+    # Removes users on blacklist
     rem_blacklist()
     for user in user_screen_name_list:
-        # for some reason can't store this and use it in multiple functions/conditionals
-        #     s_tweets = get_users_spotify_tweets(user)
-
         # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS
         # WITH LESS - hence not always selected number of users shown in table
         if count_iterable(get_users_spotify_tweets(user)) > s_tweet_minimum:
@@ -214,24 +212,46 @@ def _main_():
                 text, song_id = get_s_tweet_data(tweet)
                 tabulate_s_tweets(user_name=user, text=text, track_id=song_id, tweet_id=tweet.id, time=tweet.created_at)
 
+
+def read_all_s_tweets():
+    global all_s_tweets
+    dtypes = {'user_name': 'str', 'text': 'str', 'track_id': 'str', 'tweet_id': 'int', 'time': 'str'}
+    parse_date = ['time']
+    all_s_tweets = pd.read_csv("s_tweets_trial.csv", index_col=0, dtype=dtypes, parse_dates=parse_date)
+
+
+def _main_():
+    global all_s_tweets
+    global label_df
+    # create_all_s_tweets()
+
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
-    # Saves the tweets related to a track as a csv file [user id, text, track (if there), time]
-    all_s_tweets.to_csv("s_tweets_trial.csv")
+    # Open csv and put into s_tweets
+    read_all_s_tweets()
+    display(all_s_tweets)
+
+    # all_s_tweets.to_csv("s_tweets_trial.csv")
 
     # Gets a couple of previous tweets from a user before they posted a specific song
-    # get_before_s_tweets()
+    display(get_before_s_tweets())
 
+    display(label_df)
+    all_s_tweets = pd.concat([all_s_tweets, label_df], axis=1)
     # Gets a list of songs
     all_song_lists = create_song_lists()
 
     # Gets the largest list of songs
     max_list = max(x for x in all_song_lists)
-    print(all_song_lists)
 
     # Graphs the largest song list
     graph_one_playlist(max_list)
+
+    # Saves the tweets related to a track as a csv file [user id, text, track (if there), time]
+    all_s_tweets.to_csv("s_tweets_trial.csv")
+
+    display(all_s_tweets)
 
     # Outdated
     # Gets all tweets from a user

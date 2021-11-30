@@ -16,10 +16,7 @@ tone_analyzer = ToneAnalyzerV3(
 tone_analyzer.set_service_url(
     'https://api.eu-gb.tone-analyzer.watson.cloud.ibm.com/instances/54ddd4d4-1449-40a7-8c05-fb9494afa611')
 
-sample_text_old = "'Team, I know that times are tough! Product '\
-    'sales have been disappointing for the past three '\
-    'quarters. We have a competitive product, but we '\
-    'need to do a better job of selling it!'"
+sample_text_old = "Team, I know that times are tough! \n Product sales have been disappointing for the past three quarters. \n We have a competitive product, but we need more!"
 
 sample_text = "Donda is a work of art \n They said I was mad at the Grammys BUT IM LOOKING AT MY GRAMMY RN \n This isnt enough I need 4K"
 
@@ -38,7 +35,7 @@ def get_senti(text):
     # get tones for each sentence (if multiple sentences)
     try:
         analysis = response['sentences_tone']
-        print("MULTIPLE SENTENCES")
+        # print("MULTIPLE SENTENCES")
         for item in analysis:
             df2 = sentence_analyser(item['tones'])
             main_df = main_df.append(df2, ignore_index=True)                # append tone values to total dataframe
@@ -68,7 +65,7 @@ def array_maker(json_output):
 def sentence_analyser(item):
     if not item:
         return None
-    # For each type of tone in a sentece (usually just one)
+    # For each type of tone in a sentence (usually just one)
     tone_id_list = []
     tone_value = []
     for aspect in item:

@@ -66,10 +66,6 @@ def graph_one_playlist(song_list_graph_one):
     vz = 'speechiness'
 
     w, x, y, z = get_x_y_z(song_list_graph_one, vw, vx, vy, vz)
-    print("w: ", w)
-    print("x: ", x)
-    print("y: ", y)
-    print("z: ", z)
     fig1 = plt.figure()
 
     ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
