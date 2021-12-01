@@ -1,4 +1,5 @@
 import spotipy
+from IPython.core.display import display
 from cffi.backend_ctypes import xrange
 from spotipy.oauth2 import SpotifyOAuth
 import datetime
@@ -119,6 +120,38 @@ def graph_two_playlist(varx, vary, varz, w1, x1, y1, z1, w2, x2, y2, z2):
 
 
 # -----------------------------------------------------------------------------
+
+# TODO add error detection (track_id)
+def label_heatmap(song_label_df):
+    example_user_name = song_label_df['user_name'][1]
+    song_label_df = song_label_df[song_label_df['user_name'] == example_user_name]
+    song_label_df = song_label_df[song_label_df['anger'].notna()]
+    track_list = song_label_df['track_id'].tolist()
+
+
+    vw = 'acousticness'
+    vx = 'valence'
+    vy = 'energy'
+    vz = 'speechiness'
+
+    w, x, y, z = get_x_y_z(track_list, vw, vx, vy, vz)
+    fig1 = plt.figure()
+
+    w = song_label_df['sadness']
+
+    ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
+
+    # 4-dimensions
+    img = ax.scatter(x, y, z, c=w, cmap=plt.hot(), vmin=0, vmax=1, marker=".")
+    fig1.colorbar(img)
+
+    # 3-dimensions
+    # img = ax.scatter(x, y, z, marker=".")
+
+    ax.set_xlabel(vx)
+    ax.set_ylabel(vy)
+    ax.set_zlabel(vz)
+    plt.show()
 
 
 def main():

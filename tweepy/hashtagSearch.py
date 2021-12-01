@@ -12,7 +12,7 @@ import numpy as np
 from IPython.display import display
 
 from sentiment.sentimentAnalyser import get_senti, label_column_names
-from spotipy_section.graphPlaylist import graph_one_playlist
+from spotipy_section.graphPlaylist import graph_one_playlist, label_heatmap
 
 api = innit_tweepy.getTweepyApi()
 
@@ -215,12 +215,18 @@ def create_all_s_tweets():
                 tabulate_s_tweets(user_name=user, text=text, track_id=song_id, tweet_id=tweet.id, time=tweet.created_at)
 
 
-def read_all_s_tweets():
+def read_all_s_tweets(file_name):
     global all_s_tweets
     dtypes = {'user_name': 'str', 'text': 'str', 'track_id': 'str', 'tweet_id': 'int64', 'time': 'str'}
     parse_date = ['time']
-    all_s_tweets = pd.read_csv("s_tweets_trial.csv", index_col=0, dtype=dtypes, parse_dates=parse_date)
+    all_s_tweets = pd.read_csv(file_name, index_col=0, dtype=dtypes, parse_dates=parse_date)
     all_s_tweets["track_id"].astype(str)
+
+
+# FIXME
+def get_heatmap():
+    data_to_graph = all_s_tweets
+    label_heatmap(data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis = 1))
 
 
 def _main_():
@@ -235,25 +241,25 @@ def _main_():
     # display(all_s_tweets)
 
     # Open csv and put into s_tweets
-    read_all_s_tweets()
+    read_all_s_tweets("song_and_labels.csv")
 
     # all_s_tweets.to_csv("s_tweets_trial.csv")
 
     # Gets a couple of previous tweets from a user before they posted a specific song
     # Also adds labels of sentiment to each song
-    get_before_s_tweets()
-    all_s_tweets = pd.concat([all_s_tweets, label_df], axis=1)
-    all_s_tweets.to_csv("song_and_labels.csv")
+    # get_before_s_tweets()
+    # all_s_tweets = pd.concat([all_s_tweets, label_df], axis=1)
+
+    # all_s_tweets.to_csv("song_and_labels.csv")
 
     # Gets a list of songs
     all_song_lists = create_song_lists()
-
     # Gets the largest list of songs
     max_list = max(x for x in all_song_lists)
 
     # Graphs the largest song list
     # graph_one_playlist(max_list)
-
+    get_heatmap()
     # Outdated
     # Gets all tweets from a user
     # get_all_users_tweets()
