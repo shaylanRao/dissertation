@@ -4,12 +4,14 @@ from datetime import timedelta
 from string import punctuation
 
 import tweepy
+from numpy import int64
+
 import innit_tweepy
 import pandas as pd
 import numpy as np
 from IPython.display import display
 
-from sentiment.sentimentAnalyser import get_senti
+from sentiment.sentimentAnalyser import get_senti, label_column_names
 from spotipy_section.graphPlaylist import graph_one_playlist
 
 api = innit_tweepy.getTweepyApi()
@@ -19,10 +21,11 @@ song_list = []
 user_screen_name_list = []
 all_tweets = []
 
-column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
-all_s_tweets = pd.DataFrame(columns=column_names)
+tweet_column_names = ["user_name", "text", "track_id", "tweet_id", "time"]
+all_s_tweets = pd.DataFrame(columns=tweet_column_names)
 
-label_df = pd.DataFrame()
+# Defined in sentimentAnalyser.py
+label_df = pd.DataFrame(columns=label_column_names)
 
 black_list = ['BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777', 'bieberonspotify',
               'LiveMixPlay', 'CAA_Official', 'fabclaxton', 'THXJRT', 'moevazquez']
@@ -67,7 +70,7 @@ def get_users_spotify_tweets(screen_name):
 # Cleans text data - passed as string
 def clean_text(message):
     # Removes space, flattens text
-    tweet_text = message.replace('\n', '')
+    tweet_text = message.replace('\n', ' ')
 
     # Removes urls
     tweet_text = re.sub(r'http\S+', '', tweet_text)
@@ -115,7 +118,8 @@ def create_song_lists():
         user_song_list = []
         for row in all_s_tweets[all_s_tweets['user_name'] == user].iterrows():
             # Gets track ID from tweet
-            if row[1][2] != "":
+            # Checks for no track (and for when it reads data from csv - empty is stored as float
+            if row[1][2] != "" and type(row[1][2]) == str:
                 user_song_list.append(row[1][2])
 
         if user_song_list:
@@ -123,18 +127,16 @@ def create_song_lists():
     return all_user_lists
 
 
-# TODO appending dataframe of labels to each song
 def add_song_label(messages):
     global label_df
+    empty_df = pd.DataFrame()
+
     label = get_senti(messages)
-    print("Label:")
-    display(label)
-    print("-------------------------")
-    df = pd.DataFrame({label})
-    df.transpose()
-    display(df)
-    label_df.append(df)
-    label_df = label_df.append(df)
+    try:
+        label = label.to_frame().T
+        label_df = label_df.append(label, ignore_index=True)
+    except AttributeError:
+        label_df = label_df.append(pd.Series(0, index=label_df.columns), ignore_index=True)
 
 
 def get_before_s_tweets():
@@ -157,7 +159,7 @@ def get_before_s_tweets():
             until_date += timedelta(days=1)
 
             # Gets tweet_id
-            tweet_id = s_tweet[1][3]
+            tweet_id = int64(s_tweet[1][3])
 
             # Query for tweets from user
             query = 'lang:en exclude:replies -filter:retweets ' + user
@@ -183,7 +185,7 @@ def get_before_s_tweets():
 
             # Gets overall sentiment from past tweets together (rounded sentiment leading upto song)
             #     Acts as label for song
-            # print(get_senti(messages))
+            print(messages)
             add_song_label(messages)
 
 
@@ -215,9 +217,10 @@ def create_all_s_tweets():
 
 def read_all_s_tweets():
     global all_s_tweets
-    dtypes = {'user_name': 'str', 'text': 'str', 'track_id': 'str', 'tweet_id': 'int', 'time': 'str'}
+    dtypes = {'user_name': 'str', 'text': 'str', 'track_id': 'str', 'tweet_id': 'int64', 'time': 'str'}
     parse_date = ['time']
     all_s_tweets = pd.read_csv("s_tweets_trial.csv", index_col=0, dtype=dtypes, parse_dates=parse_date)
+    all_s_tweets["track_id"].astype(str)
 
 
 def _main_():
@@ -225,20 +228,23 @@ def _main_():
     global label_df
     # create_all_s_tweets()
 
+    # Saves the tweets related to a track as a csv file [user id, text, track (if there), time]
+    # all_s_tweets.to_csv("s_tweets_trial.csv")
+
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
     # Open csv and put into s_tweets
     read_all_s_tweets()
-    display(all_s_tweets)
 
     # all_s_tweets.to_csv("s_tweets_trial.csv")
 
     # Gets a couple of previous tweets from a user before they posted a specific song
-    display(get_before_s_tweets())
-
-    display(label_df)
+    # Also adds labels of sentiment to each song
+    get_before_s_tweets()
     all_s_tweets = pd.concat([all_s_tweets, label_df], axis=1)
+    all_s_tweets.to_csv("song_and_labels.csv")
+
     # Gets a list of songs
     all_song_lists = create_song_lists()
 
@@ -246,12 +252,7 @@ def _main_():
     max_list = max(x for x in all_song_lists)
 
     # Graphs the largest song list
-    graph_one_playlist(max_list)
-
-    # Saves the tweets related to a track as a csv file [user id, text, track (if there), time]
-    all_s_tweets.to_csv("s_tweets_trial.csv")
-
-    display(all_s_tweets)
+    # graph_one_playlist(max_list)
 
     # Outdated
     # Gets all tweets from a user

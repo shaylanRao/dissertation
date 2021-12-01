@@ -20,11 +20,11 @@ sample_text_old = "Team, I know that times are tough! \n Product sales have been
 
 sample_text = "Donda is a work of art \n They said I was mad at the Grammys BUT IM LOOKING AT MY GRAMMY RN \n This isnt enough I need 4K"
 
-column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
+label_column_names = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
 
 
 def get_senti(text):
-    main_df = pd.DataFrame(columns=column_names)
+    label_df = pd.DataFrame(columns=label_column_names)
     # if parameter us empty
     if text == "":
         return None
@@ -38,24 +38,27 @@ def get_senti(text):
         # print("MULTIPLE SENTENCES")
         for item in analysis:
             df2 = sentence_analyser(item['tones'])
-            main_df = main_df.append(df2, ignore_index=True)                # append tone values to total dataframe
+            label_df = label_df.append(df2, ignore_index=True)                # append tone values to total dataframe
+
+            # return dataframe from multiple sentences
+        label_df = label_df.fillna(0).mean()
+        return label_df
     # only one sentence (the next tweet is a song)
     except KeyError:
         # Returns the sentiment score value for the single sentence
         try:
             df = sentence_analyser(response['document_tone']['tones'])
-            main_df = main_df.append(df, ignore_index=True)
-            return main_df.fillna(0).mean()
+            label_df = label_df.append(df, ignore_index=True)
+            label_df = label_df.fillna(0).mean()
+            return label_df
         # No tone identified
         except IndexError:
             return "Gibberish"
-    # return dataframe from multiple sentences
-    return main_df.fillna(0).mean()
 
 
 #
 def array_maker(json_output):
-    main_df = pd.DataFrame(columns=column_names)
+    main_df = pd.DataFrame(columns=label_column_names)
     array = np.array("")
     for i in range(2):
         array = np.append(array, [json_output['sentences_tone'][i]['sentence_id']])
@@ -79,7 +82,7 @@ def sentence_analyser(item):
 def main():
     # json_values = (get_senti(sample_text))
     data = []
-    main_df = pd.DataFrame(columns=column_names)
+    main_df = pd.DataFrame(columns=label_column_names)
     df2 = {'anger': '0.3242', 'sadness': '0.8864', 'analytical': '0.0234'}
     main_df = main_df.append(df2, ignore_index=True)
 
