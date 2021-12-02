@@ -51,7 +51,7 @@ def get_song_list_ids(pl_id):
 
 
 # Returns attributes x, y, z given playlist id
-def get_x_y_z(song_list_ids, varw, varx, vary, varz):
+def get_w_to_z(song_list_ids, varw, varx, vary, varz):
     # Get features for each song in list
     features = sp.audio_features(song_list_ids)
 
@@ -62,6 +62,17 @@ def get_x_y_z(song_list_ids, varw, varx, vary, varz):
     z = get_attribute(features, varz)
 
     return w, x, y, z
+
+def get_x_y_z(song_list_ids, varx, vary, varz):
+    # Get features for each song in list
+    features = sp.audio_features(song_list_ids)
+
+    # print(features[0])
+    y = get_attribute(features, vary)
+    x = get_attribute(features, varx)
+    z = get_attribute(features, varz)
+
+    return x, y, z
 
 
 def show_graph_sample(varx, vary, varz, x1, x2, x3, y1, y2, y3, z1, z2, z3):
@@ -86,7 +97,7 @@ def graph_one_playlist(song_list_graph_one):
     vy = 'energy'
     vz = 'speechiness'
 
-    w, x, y, z = get_x_y_z(song_list_graph_one, vw, vx, vy, vz)
+    w, x, y, z = get_w_to_z(song_list_graph_one, vw, vx, vy, vz)
     fig1 = plt.figure()
 
     ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
@@ -124,21 +135,6 @@ def graph_two_playlist(varx, vary, varz, w1, x1, y1, z1, w2, x2, y2, z2):
     plt.show()
 
 
-# Define the 3 variables
-# varx = 'valence'
-# vary = 'energy'
-# varz = 'speechiness'
-#
-#
-# x1, y1, z1 = get_x_y_z(get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo'))
-# x2, y2, z2 = get_x_y_z(get_song_list_ids('78FHjijA1gBLuVx4qmcHq6'))
-# # x3, y3, z3 = get_x_y_z(spotipyDocCode.get_recently_played())
-#
-# x3, y3, z3 = get_x_y_z(get_song_list_ids('3aBeWOxyVcFupF8sKMm2k7'))
-#
-# show_graph()
-
-
 # -----------------------------------------------------------------------------
 
 # TODO add error detection (track_id)
@@ -149,159 +145,42 @@ def label_heatmap(song_label_df):
     song_label_df = song_label_df[song_label_df['user_name'] == example_user_name]
     song_label_df = song_label_df[song_label_df['anger'].notna()]
     track_list = song_label_df['track_id'].tolist()
-
-    surf_plot_2(track_list, song_label_df)
-    # interactive_graph()
-
-    # vw = 'acousticness'
-    # vx = 'valence'
-    # vy = 'energy'
-    # vz = 'speechiness'
-    #
-    # w, x, y, z = get_x_y_z(track_list, vw, vx, vy, vz)
-    # fig1 = plt.figure()
-    #
-    # w = song_label_df['sadness']
-    #
-    # ax = fig1.add_subplot(projection='3d', xlim=(0, 1), ylim=(0, 1), zlim=(0, 1))
-    #
-    # # 4-dimensions
-    # img = ax.scatter(x, y, z, c=w, cmap='RdBu', vmin=0, vmax=1, marker=".")
-    # fig1.colorbar(img)
-    #
-    # # 3-dimensions
-    # # img = ax.scatter(x, y, z, marker=".")
-    #
-    # ax.set_xlabel(vx)
-    # ax.set_ylabel(vy)
-    # ax.set_zlabel(vz)
-    # plt.show()
-
-
-def test_2d_heatmap(track_list, song_label_df):
-    vw = 'acousticness'
     vx = 'valence'
     vy = 'energy'
     vz = 'speechiness'
 
-    w, x, y, z = get_x_y_z(track_list, vw, vx, vy, vz)
+    x, y, z = get_x_y_z(track_list, vx, vy, vz)
 
-    w = song_label_df['sadness']
+    # Define sentiment (label)
+    label_name = 'sadness'
+    label = song_label_df[label_name]
+    surf_plot_2(x, y, label, label_name)
 
-    heatmap, xedges, yedges = np.histogram2d(x, y, bins=100)
-    extent = [0, 1, 0, 1]
-
-    plt.clf()
-    plt.imshow(heatmap.T, extent=extent, origin='lower')
-    # plt.xlim(0, 1), ylim(0, 1)
-    plt.show()
-
-
-def surface_plot(track_list, song_label_df):
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
-    import matplotlib.pyplot as plt
-    from matplotlib import cm
-    from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    import numpy as np
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-
-    vw = 'acousticness'
-    vx = 'valence'
-    vy = 'energy'
-    vz = 'speechiness'
-
-    w, x, y, z = get_x_y_z(track_list, vw, vx, vy, vz)
-    w = song_label_df['sadness']
-    print(w)
-    # Make data.
-    xlist = [0.876, 0.461, 0.601, 0.488, 0.403, 0.315, 0.711, 0.462, 0.467, 0.439, 0.647, 0.403, 0.31, 0.494]
-    ylist = [0.861, 0.886, 0.63, 0.748, 0.842, 0.424, 0.711, 0.644, 0.749, 0.639, 0.987, 0.842, 0.616, 0.833]
-
-    xlist = sorted(xlist)
-    ylist = sorted(ylist)
-    # xlist = [0.876, 0.461, 0.601, 0.488, 0.403, 0.315, 0.5]
-    # ylist = [0.861, 0.886, 0.63, 0.748, 0.842, 0.424]
-
-    Z = np.random.rand(14, 14)
-
-    X, Y = np.meshgrid(xlist, ylist)
-
-    # Plot the surface.
-    surf = ax.plot_surface(X, Y, Z, cmap=cm.plasma,
-                           linewidth=0, vmin=0, vmax=1, antialiased=False)
-
-    # Customize the z axis.
-    ax.set_zlim(0, 1), ylim(0, 1), xlim(0, 1)
-    ax.zaxis.set_major_locator(LinearLocator(10))
-    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-    # Add a color bar which maps values to colors.
-    fig.colorbar(surf, shrink=0.5, aspect=5)
-
-    plt.show()
+    label_name = 'joy'
+    label = song_label_df[label_name]
+    surf_plot_2(x, y, label, label_name)
 
 
-def surf_plot_2(track_list, song_label_df):
-    vw = 'acousticness'
-    vx = 'valence'
-    vy = 'energy'
-    vz = 'speechiness'
-
-    w, x, y, z = get_x_y_z(track_list, vw, vx, vy, vz)
-
-    w = song_label_df['sadness']
-
-    data = list(zip(x, y, w))
-    x, y, z = zip(*data)
-    # z = list(map(float, w))
-    grid_x, grid_y = np.mgrid[min(x):max(x):100j, min(y):max(y):100j]
-    grid_z = griddata((x, y), z, (grid_x, grid_y), method='cubic')
+def surf_plot_2(x, y, label, label_name):
+    data = list(zip(x, y, label))
+    x, y, label = zip(*data)
+    grid_x, grid_y = np.mgrid[0:1:100j, 0:1:100j]
+    grid_z = griddata((x, y), label, (grid_x, grid_y), method='cubic')
     grid_z[np.isnan(grid_z)] = 0
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    # ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     ax.plot_surface(grid_x, grid_y, grid_z, cmap=plt.cm.plasma)
 
-    ax.set_xlabel(vx)
-    ax.set_ylabel(vy)
-    ax.set_zlabel('sadness')
+    # Fixed label names for x and y
+    ax.set_xlabel('Valence')
+    ax.set_ylabel('Energy')
+    ax.set_zlabel(label_name)
 
     ax.set_zlim(0, 1)
     plt.xlim(0, 1)
     plt.ylim(0, 1)
 
-    plt.show()
-
-
-def test_3d():
-    # creating a dummy dataset
-    x = np.random.randint(low=100, high=500, size=(1000,))
-    y = np.random.randint(low=300, high=500, size=(1000,))
-    z = np.random.randint(low=200, high=500, size=(1000,))
-    colo = [x + y + z]
-
-    # creating figures
-    fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection='3d')
-
-    # setting color bar
-    color_map = cm.ScalarMappable()
-    color_map.set_array([colo])
-
-    # creating the heatmap
-    img = ax.scatter(x, y, z, marker='s',
-                     s=200, color='green')
-    plt.colorbar(color_map)
-
-    # adding title and labels
-    ax.set_title("3D Heatmap")
-    ax.set_xlabel('X-axis')
-    ax.set_ylabel('Y-axis')
-    ax.set_zlabel('Z-axis')
-
-    # displaying plot
     plt.show()
 
 

@@ -12,7 +12,7 @@ song_id_twitter = hashtagSearch.get_twitter_song_list()
 
 # w1, x1, y1, z1 = graphPlaylist.get_x_y_z(song_ids1, vw, vx, vy, vz)
 # w2, x2, y2, z2 = graphPlaylist.get_x_y_z(song_ids2, vw, vx, vy, vz)
-wt, xt, yt, zt = graphPlaylist.get_x_y_z(song_id_twitter, vw, vx, vy, vz)
+wt, xt, yt, zt = graphPlaylist.get_w_to_z(song_id_twitter, vw, vx, vy, vz)
 
 # graphPlaylist.graph_one_playlist(vx, vy, vz, w1, x1, y1, z1)
 # graphPlaylist.graph_two_playlist(vx, vy, vz, w1, x1, y1, z1, w2, x2, y2, z2)
