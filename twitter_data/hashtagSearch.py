@@ -8,7 +8,7 @@ from numpy import int64
 
 import pandas as pd
 
-from classification.classification import standardizer, classify, classify2
+from classification.classification import standardizer, classifier
 from sentiment.sentimentAnalyser import get_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap
 from twitter_data import innit_tweepy
@@ -231,7 +231,7 @@ def get_heatmap():
 
 def classify_data():
     data_to_graph = all_s_tweets
-    classify2(data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1))
+    classifier(data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1))
 
 
 def get_max_songlist():
