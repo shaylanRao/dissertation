@@ -2,6 +2,7 @@ import re
 from datetime import timedelta
 from string import punctuation
 
+import pandas
 import tweepy
 from IPython.core.display import display
 from numpy import int64
@@ -223,15 +224,38 @@ def read_s_tweet_file(file_name):
     all_s_tweets.dropna(subset=["track_id"], inplace=True)
 
 
+# def get_single_user_data():
+#     print("here")
+#     data_to_graph = all_s_tweets
+#     data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
+#     mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
+#     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
+#     data_to_graph = data_to_graph.reset_index().drop(columns='index')
+#     # data_to_graph = data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1)
+#     display(data_to_graph)
+#     return data_to_graph
+
+
 # FIXME
 def get_heatmap():
     data_to_graph = all_s_tweets
-    label_heatmap(data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1))
+    data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
+    mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
+    data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
+    data_to_graph = data_to_graph.reset_index().drop(columns='index')
+    data_to_graph = data_to_graph.drop(data_to_graph.columns[['text', 'tweet_id', 'time']], axis=1)
+    display(data_to_graph)
+    label_heatmap(data_to_graph)
 
 
 def classify_data():
     data_to_graph = all_s_tweets
-    classifier(data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1))
+    data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
+    mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
+    data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
+    data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time', ])
+    # display(data_to_graph)
+    classifier(data_to_graph)
 
 
 def get_max_songlist():
