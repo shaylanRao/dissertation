@@ -2,14 +2,13 @@ import re
 from datetime import timedelta
 from string import punctuation
 
-import pandas
 import tweepy
 from IPython.core.display import display
 from numpy import int64
 
 import pandas as pd
 
-from classification.classification import standardizer, classifier
+from classification.classification import Classifier
 from sentiment.sentimentAnalyser import get_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap
 from twitter_data import innit_tweepy
@@ -255,7 +254,8 @@ def classify_data():
     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
     data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time', ])
     # display(data_to_graph)
-    classifier(data_to_graph)
+    classifier = Classifier(data_to_graph, "joy")
+    classifier.classify()
 
 
 def get_max_songlist():
