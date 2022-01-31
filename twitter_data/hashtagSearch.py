@@ -2,6 +2,7 @@ import re
 from datetime import timedelta
 from string import punctuation
 
+import pandas
 import tweepy
 from IPython.core.display import display
 from numpy import int64
@@ -9,8 +10,9 @@ from numpy import int64
 import pandas as pd
 
 from classification.classification import Classifier
-from sentiment.sentimentAnalyser import get_senti, COLUMN_HEADINGS
-from spotipy_section.graphPlaylist import label_heatmap
+from sentiment.lyric_sentiment import get_lyrics_senti
+from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
+from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
 from twitter_data import innit_tweepy
 
 
@@ -24,10 +26,10 @@ all_tweets = []
 TWEET_COLUMN__NAMES = ["user_name", "text", "track_id", "tweet_id", "time"]
 all_s_tweets = pd.DataFrame(columns=TWEET_COLUMN__NAMES)
 
-# Defined in sentimentAnalyser.py
+# Defined in sentiment_analyser.py
 label_df = pd.DataFrame(columns=COLUMN_HEADINGS)
 
-BLACKLIST = ['BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777', 'bieberonspotify',
+BLACKLIST = ['BBC3MusicBot', 'BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777', 'bieberonspotify',
              'LiveMixPlay', 'CAA_Official', 'fabclaxton', 'THXJRT', 'moevazquez']
 
 NUM_USERS = 10
@@ -131,7 +133,7 @@ def get_users_song_lists():
 def add_song_label(messages):
     global label_df
 
-    label = get_senti(messages)
+    label = get_text_senti(messages)
     try:
         label = label.to_frame().T
         label_df = label_df.append(label, ignore_index=True)
@@ -223,16 +225,24 @@ def read_s_tweet_file(file_name):
     all_s_tweets.dropna(subset=["track_id"], inplace=True)
 
 
-# def get_single_user_data():
-#     print("here")
-#     data_to_graph = all_s_tweets
-#     data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
-#     mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
-#     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
-#     data_to_graph = data_to_graph.reset_index().drop(columns='index')
-#     # data_to_graph = data_to_graph.drop(data_to_graph.columns[[1, 3, 4]], axis=1)
-#     display(data_to_graph)
-#     return data_to_graph
+def get_lyric_sentiment(df):
+    lyric_df = pandas.DataFrame()
+    for row_index, df_row in df.iterrows():
+        trackid = df_row['track_id']
+        song_name, artist_name = get_artist_song_name(trackid)
+        row = get_lyrics_senti(song_name, artist_name)
+        try:
+            if row.empty:
+                print(row_index, "EMPTY")
+                lyric_df = lyric_df.append(pandas.Series(), ignore_index=True)
+            else:
+                lyric_df = lyric_df.append(row, ignore_index=True)
+        except AttributeError:
+            lyric_df = lyric_df.append(pandas.Series(), ignore_index=True)
+    lyric_df.reset_index(inplace=True, drop=True)
+    lyric_df = lyric_df.fillna(0)
+    df_concat = pd.concat([df, lyric_df], axis=1)
+    return df_concat
 
 
 # FIXME
@@ -242,8 +252,7 @@ def get_heatmap():
     mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
     data_to_graph = data_to_graph.reset_index().drop(columns='index')
-    data_to_graph = data_to_graph.drop(data_to_graph.columns[['text', 'tweet_id', 'time']], axis=1)
-    display(data_to_graph)
+    data_to_graph = data_to_graph.drop(columns=['text', 'tweet_id', 'time'])
     label_heatmap(data_to_graph)
 
 
@@ -254,6 +263,9 @@ def classify_data():
     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
     data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time', ])
     # display(data_to_graph)
+    data_to_graph = get_lyric_sentiment(data_to_graph)
+    data_to_graph.to_csv('datatoclassify.csv')
+    print(mode_user_name, "'s ", "Data Size: ", len(data_to_graph))
     classifier = Classifier(data_to_graph, "joy")
     classifier.classify()
 

@@ -26,6 +26,13 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
                                                redirect_uri=REDIRECT_URL, show_dialog=True))
 
 
+def get_artist_song_name(trackid):
+    track = sp.track(trackid)
+    song_name = track['name']
+    artist_name = track['artists'][0]['name']
+    return song_name, artist_name
+
+
 def get_attribute(all_features, select_feature):
     return [all_features[i][select_feature] for i in range(len(all_features))]
 
@@ -196,40 +203,6 @@ def label_heatmap(song_label_df):
     # test_graph(song_label_df)
 
 
-def test_graph(song_df):
-    # import plotly.express as px
-    # import plotly.io as pio
-    # pio.renderers.default = "browser"
-    # # px.data.iris().to_csv("iris.csv")
-    #
-    # df = song_df
-    # features = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
-    # fig = px.scatter_matrix(df, dimensions=features, color="user_name")
-    # fig.update_layout({"xaxis" + str(i + 1): dict(range=[0, 1]) for i in range(7)})
-    # fig.update_layout({"yaxis" + str(i + 1): dict(range=[0, 1]) for i in range(7)})
-    # fig.update_traces(diagonal_visible=False)
-    # fig.show()
-    from sklearn.manifold import TSNE
-    import plotly.express as px
-    from warnings import simplefilter
-    # ignore all future warnings
-    simplefilter(action='ignore', category=FutureWarning)
-
-    df = px.data.iris()
-
-    features = df.loc[:, :'petal_width']
-    # print('sklearn: %s' % manifold.__version__)
-    tsne = TSNE(n_components=2, random_state=0)
-
-    projections = tsne.fit_transform(features)
-
-    fig = px.scatter(
-        projections, x=0, y=1,
-        color=df.species, labels={'color': 'species'}
-    )
-    fig.show()
-
-
 def plotly_interpolation(label_data):
     import plotly.io as pio
     pio.renderers.default = "browser"
@@ -305,7 +278,7 @@ def get_grids(x, y, label):
     data = list(zip(x, y, label))
     x, y, label = zip(*data)
     grid_x, grid_y = np.mgrid[0:1:100j, 0:1:100j]
-    grid_z = griddata((x, y), label, (grid_x, grid_y), method='cubic')
+    grid_z = griddata((x, y), label, (grid_x, grid_y), method='linear')
     grid_z[np.isnan(grid_z)] = 0
     return grid_x, grid_y, grid_z
 

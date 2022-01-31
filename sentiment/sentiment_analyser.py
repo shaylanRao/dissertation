@@ -6,6 +6,7 @@ AUTH_CODE = 'j6wBu5zuY4Kq2gyu0MGSXNg2Qc2Zsz-Hqye4mTVM-lZ2'
 VERSION = '2017-09-21'
 SERVICE_URL = 'https://api.eu-gb.tone-analyzer.watson.cloud.ibm.com/instances/54ddd4d4-1449-40a7-8c05-fb9494afa611'
 COLUMN_HEADINGS = ["anger", "fear", "joy", "sadness", "analytical", "confident", "tentative"]
+COLUMN_HEADINGS_LYRICS = ["lyric_{0}".format(i) for i in COLUMN_HEADINGS]
 
 authenticator = IAMAuthenticator(AUTH_CODE)
 tone_analyzer = ToneAnalyzerV3(
@@ -30,7 +31,8 @@ def sentence_analyser(item):
     return df2
 
 
-def get_senti(text):
+def get_text_senti(text):
+    print(text)
     label_df = pd.DataFrame(columns=COLUMN_HEADINGS)
     # if parameter us empty
     if text == "":
@@ -61,3 +63,21 @@ def get_senti(text):
         # No tone identified
         except IndexError:
             return "Gibberish"
+
+
+def get_l_senti(lyrics):
+    label_df = pd.DataFrame(columns=COLUMN_HEADINGS)
+    # if parameter us empty
+    if lyrics == "":
+        return None
+    # Analyse the text (all sentences)
+    response = tone_analyzer.tone({'text': lyrics},
+                                  sentences=True
+                                  ).get_result()
+
+    df = sentence_analyser(response['document_tone']['tones'])
+    label_df = label_df.append(df, ignore_index=True)
+    label_df = label_df.fillna(0)
+    # Renames column headings
+    label_df.columns = COLUMN_HEADINGS_LYRICS
+    return label_df

@@ -47,12 +47,17 @@ class Classifier:
         # Gets the all the musical features of each song
         track_features = get_all_music_features(track_list)
         self.user_data = pd.concat([self.user_data, track_features], axis=1)
-
+        # self.user_data.to_csv('userdata.csv')
         # Randomizes rows
         shuffled_data = self.user_data.sample(frac=1)
 
-        # Accesses and sets the data and labels from main df
+        # Sets music components as data
+        # self.set_train_test_data(shuffled_data.iloc[:, 16:])
+
+        # Sets music components and lyrical sentiment as data
         self.set_train_test_data(shuffled_data.iloc[:, 9:])
+
+        # and anger to tentative as labels
         self.set_train_test_labels(shuffled_data.iloc[:, 2:9])
         # standardizes the data
         self.train_data, self.test_data = self.standardizer()
