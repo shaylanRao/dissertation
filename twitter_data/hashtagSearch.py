@@ -9,7 +9,7 @@ from numpy import int64
 
 import pandas as pd
 
-from classification.classification import Classifier
+from classification.classification import Classifier, KernelSvc
 from sentiment.lyric_sentiment import get_lyrics_senti
 from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
@@ -33,7 +33,7 @@ BLACKLIST = ['BBC3MusicBot', 'BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', '
              'LiveMixPlay', 'CAA_Official', 'fabclaxton', 'THXJRT', 'moevazquez']
 
 NUM_USERS = 10
-MAX_SONG_TWEETS = 20
+MAX_SONG_TWEETS = 50
 NUM_BEFORE_TWEETS = 3
 S_TWEET_MIN_NUM = 6
 
@@ -233,12 +233,11 @@ def get_lyric_sentiment(df):
         row = get_lyrics_senti(song_name, artist_name)
         try:
             if row.empty:
-                print(row_index, "EMPTY")
-                lyric_df = lyric_df.append(pandas.Series(), ignore_index=True)
+                lyric_df = lyric_df.append(pandas.Series(dtype=float), ignore_index=True)
             else:
                 lyric_df = lyric_df.append(row, ignore_index=True)
         except AttributeError:
-            lyric_df = lyric_df.append(pandas.Series(), ignore_index=True)
+            lyric_df = lyric_df.append(pandas.Series(dtype=float), ignore_index=True)
     lyric_df.reset_index(inplace=True, drop=True)
     lyric_df = lyric_df.fillna(0)
     df_concat = pd.concat([df, lyric_df], axis=1)
@@ -266,8 +265,12 @@ def classify_data():
     data_to_graph = get_lyric_sentiment(data_to_graph)
     data_to_graph.to_csv('datatoclassify.csv')
     print(mode_user_name, "'s ", "Data Size: ", len(data_to_graph))
-    classifier = Classifier(data_to_graph, "joy")
-    classifier.classify()
+
+    # classifier = Classifier(data_to_graph, "joy")
+    # classifier.classify()
+
+    svm_classify = KernelSvc(data_to_graph, "joy")
+    svm_classify.drive()
 
 
 def get_max_songlist():
@@ -322,7 +325,7 @@ def _main_():
     # Graphs the largest song list
     # graph_one_playlist(max_list)
 
-    # get_heatmap()
+    get_heatmap()
     classify_data()
 
     # --Outdated--

@@ -4,7 +4,10 @@ import numpy as np
 import pandas
 import pandas as pd
 from IPython.core.display import display
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC, SVR
+
 from spotipy_section.graphPlaylist import get_all_music_features, ALL_FEATURE_LABELS, view_scatter_graph
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
@@ -16,7 +19,7 @@ class Classifier:
         self.EMOTION = emotion
 
     TRAIN_DATA_PROPORTION = 0.7
-    LOG_THRESHOLD = 0.3
+    LOG_THRESHOLD = 0.5
     DATA_PRESERVED = 0.95
 
     train_lbl = pandas.Series
@@ -41,7 +44,6 @@ class Classifier:
 
     # --- formatting training data and test data for modeling ---
     def prep_data(self):
-        # global train_data, test_data, test_lbl, train_lbl
         # Gets the list of tracks from the user
         track_list = self.user_data['track_id'].tolist()
         # Gets the all the musical features of each song
@@ -50,26 +52,20 @@ class Classifier:
         # self.user_data.to_csv('userdata.csv')
         # Randomizes rows
         shuffled_data = self.user_data.sample(frac=1)
-
         # Sets music components as data
-        # self.set_train_test_data(shuffled_data.iloc[:, 16:])
-
+        self.set_train_test_data(shuffled_data.iloc[:, 16:])
         # Sets music components and lyrical sentiment as data
-        self.set_train_test_data(shuffled_data.iloc[:, 9:])
+        # self.set_train_test_data(shuffled_data.iloc[:, 9:])
 
         # and anger to tentative as labels
         self.set_train_test_labels(shuffled_data.iloc[:, 2:9])
-        # standardizes the data
-        self.train_data, self.test_data = self.standardizer()
 
     def set_train_test_data(self, music_data):
-        # global split_pos, train_data, test_data
         self.split_pos = math.ceil((len(music_data)) * self.TRAIN_DATA_PROPORTION)
         self.train_data = music_data.iloc[:self.split_pos, :]
         self.test_data = music_data.iloc[self.split_pos:, :]
 
     def set_train_test_labels(self, labels):
-        # global train_lbl, test_lbl, split_pos
         labels = labels[self.EMOTION]
         self.train_lbl = labels[:self.split_pos]
         self.test_lbl = labels[self.split_pos:]
@@ -80,9 +76,6 @@ class Classifier:
 
     # --- PCA (for use on ML techniques) ---
     def standardizer(self):
-        # get data
-        # global train_data, test_data
-
         # define scaler
         scaler = StandardScaler()
 
@@ -92,11 +85,9 @@ class Classifier:
         # Transform both datasets
         self.train_data = scaler.transform(self.train_data)
         self.test_data = scaler.transform(self.test_data)
-        return self.train_data, self.test_data
 
     # PCA function
     def prin_comp(self):
-        # global train_data, test_data
         # Keeps the relevant number of components to ensure 95% of original data is preserved
         pca = PCA(self.DATA_PRESERVED)
         pca.fit(self.train_data)
@@ -104,11 +95,11 @@ class Classifier:
         # Transform both data
         self.train_data = pca.transform(self.train_data)
         self.test_data = pca.transform(self.test_data)
+        # print(np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4) * 100))
 
     # --- Different models ---
     # Logistic regression modeling
     def log_reg_func(self):
-        # global train_data, train_lbl
         log_reg_train_lbl = self.get_log_data_labels(self.train_lbl)
         logistic_reg = LogisticRegression(solver='lbfgs', fit_intercept=False)
         logistic_reg.fit(self.train_data, log_reg_train_lbl)
@@ -116,14 +107,12 @@ class Classifier:
 
     # Linear regression modeling
     def lin_reg_func(self):
-        # global train_data
         linear_reg = LinearRegression(positive=True, fit_intercept=False)
         linear_reg.fit(self.train_data, self.train_lbl)
         return linear_reg
 
     # Ridge
     def ridge_reg_func(self):
-        # global train_data
         ridge_reg = Ridge(positive=True, fit_intercept=False)
         ridge_reg.fit(self.train_data, self.train_lbl)
         return ridge_reg
@@ -158,7 +147,6 @@ class Classifier:
         print("")
 
     def lin_reg_classifier(self):
-        # global test_data
         lin_reg_model = self.lin_reg_func()
         # predicting all values
         print("Linear Regression:")
@@ -169,7 +157,6 @@ class Classifier:
         print("")
 
     def ridge_reg_classifier(self):
-        # global test_data
         ridge_reg_model = self.ridge_reg_func()
         # predict all values
         print("Ridge Regression:")
@@ -183,9 +170,49 @@ class Classifier:
     def classify(self):
         # Gets formatted data for training and testing
         self.prep_data()
+        # standardizes the data
+        self.standardizer()
         # Does PCA on data
         self.prin_comp()
 
         self.log_reg_classifier()
         self.lin_reg_classifier()
         self.ridge_reg_classifier()
+
+
+class KernelSvc(Classifier):
+    def drive(self):
+        self.prep_data()
+        self.standardizer()
+        self.prin_comp()
+        y_pred = self.kernel("gaus")
+        self.eval(y_pred)
+
+    def kernel(self, k_type):
+        if k_type == "poly":
+            sv_classifier = SVC(kernel='poly', degree=8)
+        elif k_type == "gaus":
+            sv_classifier = SVC(kernel='rbf')
+        elif k_type == "sigmoid":
+            sv_classifier = SVC(kernel='sigmoid')
+        else:
+            print("Used Default")
+            sv_classifier = SVC(kernel='poly', degree=8)
+        sv_classifier.fit(self.train_data, self.get_log_data_labels(self.train_lbl))
+        y_pred = sv_classifier.predict(self.test_data)
+        return y_pred
+        # print("ACTUAL")
+        # print(self.get_log_data_labels(self.test_lbl))
+        # print("PREDICTION")
+        # print(y_pred)
+
+    def eval(self, y_pred):
+        print("Values")
+        print(self.get_log_data_labels(self.test_lbl))
+        print(y_pred)
+        print(confusion_matrix(self.get_log_data_labels(self.test_lbl), y_pred))
+        print(classification_report(self.get_log_data_labels(self.test_lbl), y_pred))
+
+
+class KernelSVM(Classifier):
+    def drive(self):

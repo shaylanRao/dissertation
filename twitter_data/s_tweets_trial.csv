@@ -1,37 +1,52 @@
 ,user_name,text,track_id,tweet_id,time,anger,fear,joy,sadness,analytical,confident,tentative
-0,mango_uyu,Her voice is just  ,6UDrfHEnUWI3O03sacM3KO,1487842451549454336,2022-01-30 17:37:37+00:00,0.0,0.0,0.0,0.0,0.0,0.0,0.984352
-1,mango_uyu,I love how they put her full name in the title   ,0yIUV22RiuBmcdPQHIFNsX,1487839818612899841,2022-01-30 17:27:10+00:00,0.0,0.0,0.6987070000000001,0.0,0.20675966666666667,0.0,0.0
-2,mango_uyu,This song is too too much of a gem my heart can't handle it. ,3PUKPA5eQdpiTmGUFR1p6u,1487522668618268672,2022-01-29 20:26:55+00:00,0.0,0.0,0.5043365,0.0,0.43569199999999997,0.0,0.0
-3,mango_uyu,"Well I don't wanna be the blame, not anymore  ",0UY4FvG4f9JI6kBR1BlWrZ,1487196717485535233,2022-01-28 22:51:42+00:00,0.0,0.0,0.626786,0.0,0.0,0.0,0.0
-4,mango_uyu,Starting my Saturday with Paramore classics is one of my best 2022 decision yet  ,3l9CW99AHtExIRV4hW2N5m,1487195836807540736,2022-01-28 22:48:12+00:00,0.0,0.0,0.886115,0.0,0.560098,0.0,0.0
-5,mango_uyu,Maybe you should tie me up so I don't go where you don't want me  ,4Pm6d1HchNq8x2Q67OkP8L,1487194529627533312,2022-01-28 22:43:01+00:00,0.0,0.0,0.0,0.0,0.0,0.0,0.647986
-6,mango_uyu,Bury the castle  ,6GPpocnUJbzMNMTJDLYCim,1487193070944731136,2022-01-28 22:37:13+00:00,0.0,0.2659245,0.0,0.333663,0.0,0.0,0.4111155
-7,mango_uyu,Welp it's 5am. Goodnight  ,0QjQC8sGqxUkaJFBsJjtGm,1487172530813091841,2022-01-28 21:15:36+00:00,0.0,0.0,0.699138,0.0,0.0,0.0,0.4111155
-8,mango_uyu,A NEW SAM KIM OST Y'ALL  ,0lsE1vjZQazyEnexXpD4B1,1487151910868062208,2022-01-28 19:53:40+00:00,0.0,0.0,0.0,0.0,0.560098,0.0,0.681699
-9,mango_uyu,This song hits differently in this social distancing era   ,6M1VZfBisoKZDCzBIoGpFk,1486073932986073088,2022-01-25 20:30:10+00:00,,,,,,,
-10,mango_uyu,I sorta wished this song wasn't about a breakup  ,1a2UGfluPyrXHTbL1NeFbR,1486072435514687490,2022-01-25 20:24:13+00:00,0.0,0.0,0.1425225,0.13768125,0.2254735,0.1939255,0.537002
-11,mango_uyu,This album tho ,7I8Jz8ixydAgAwO5LeyTQR,1485895267228413953,2022-01-25 08:40:12+00:00,0.0,0.0,0.0,0.676565,0.0,0.0,0.0
-12,mango_uyu,Just a line is enough. ,4u4hQml1aNk0wQUhQzijNr,1485736299181277184,2022-01-24 22:08:32+00:00,0.0,0.0,0.0,0.0,0.0,0.44779066666666667,0.31995999999999997
-13,mango_uyu,Back into kpop just for this ,6poVmpGU3y3jj1Z9xbbbH4,1485310839486054400,2022-01-23 17:57:54+00:00,0.0,0.0,0.3781545,0.0,0.0,0.0,0.473111
-14,mango_uyu,The result of listening to this song during my roadtrips: I love the rhymesssss  ,62eXXGkcDrsf7eyhTDFlgy,1485291046787756036,2022-01-23 16:39:15+00:00,0.0,0.0,0.808559,0.0,0.280049,0.0,0.0
-15,mango_uyu,Good morning. ,0oU9DIuMrbHeEDNiluTLSK,1485004307334574080,2022-01-22 21:39:51+00:00,0.0,0.0,0.907468,0.0,0.0,0.0,0.0
-16,mango_uyu,Just because I miss NELL's voice.  ,1Z6fapeJwV9YlzDZkZGd0h,1484928431980937216,2022-01-22 16:38:21+00:00,0.0,0.0,0.0,0.718788,0.842108,0.0,0.946222
-17,mango_uyu,"I played this when I was angry at the world back in 2015. Years later, I am angry today too.   ",5ohyT60P2aaBfrCSPg6gal,1484923144213528577,2022-01-22 16:17:20+00:00,0.9313205,0.0,0.0,0.0,0.0,0.0,0.0
-18,theorypoppins,"THIS IS FUNNNN might have that hook stuck in my head, it's so lovely wow ",3teU6SJL9afKYNa3kvUkrl,1487842444767080449,2022-01-30 17:37:36+00:00,0.0,0.0,0.698694,0.0,0.0,0.0,0.647986
-19,theorypoppins,"ooh yes, this is a very cute song. but that prechorus again has something in it i adore too. love this a lot  ",1CLBIo7vjSTfOpCXAcHv4n,1487841351970562052,2022-01-30 17:33:15+00:00,0.0,0.0,0.7792936666666668,0.0,0.0,0.2994423333333333,0.5587936666666667
-20,theorypoppins,this prechorus. wonderful  ,5oGerDrR1bcAQAOEoSZ56k,1487840445531045900,2022-01-30 17:29:39+00:00,0.0,0.0,0.880435,0.0,0.0,0.0,0.0
-21,theorypoppins,absolutely love this instrumental so much ,3ggVMcAqSE1KiQQoLG77tD,1487840010200047626,2022-01-30 17:27:55+00:00,0.0,0.0,0.861047,0.0,0.0,0.97759,0.0
-22,theorypoppins,why do they have the best intros  for titles AND b-sidess ,3ggVMcAqSE1KiQQoLG77tD,1487839302872707073,2022-01-30 17:25:07+00:00,0.0,0.0,0.673021,0.0,0.0,0.0,0.0
-23,theorypoppins,cute. love that outro too  ,2nHwnA3GZ6QTn5DfRIkR8M,1487839182210879491,2022-01-30 17:24:38+00:00,0.0,0.0,0.438531,0.0,0.0,0.203158,0.24772225
-24,theorypoppins,"this sounds like it should be in a james bond movie that introductory sequence, the strings  ",1HKgb1MWGgWdl5AqNN463U,1487837491143053319,2022-01-30 17:17:55+00:00,,,,,,,
-25,theorypoppins,THIS BEGINNING?= ,4RzuWJI9d6MldmmL1OqerH,1487836630949974018,2022-01-30 17:14:30+00:00,,,,,,,
-26,theorypoppins,"halfway through. the main vocal's voice here, ooh but all of them singing together too sounds so good ",1QLf7sP4i4IIy4lLsobB9q,1487836314531778560,2022-01-30 17:13:14+00:00,0.0,0.0,0.848197,0.0,0.0,0.704642,0.0
-27,theorypoppins,"the guitar is sexy. the brass along with it, their voices together on this chorus, i'm obsessed  ",6Xa6Wg7Izxp97tFnEkOApR,1487835333710471178,2022-01-30 17:09:20+00:00,0.0,0.0,0.857409,0.0,0.0,0.0,0.0
-28,theorypoppins,WHAT IN THE INTRO oh we're starting like this i love that  ,5UQMaLQ27uNVPfQt7mF1Sc,1487834901873311746,2022-01-30 17:07:37+00:00,0.0,0.0,0.707915,0.0,0.0,0.0,0.0
-29,theorypoppins,falling in love  ,5wZ2gU7pMfRrMtrCZLM0vh,1487834211381874690,2022-01-30 17:04:53+00:00,0.0,0.0,0.4224545,0.257146,0.4009135,0.0,0.0
-30,theorypoppins,OOH WAIT A MINUTEEEEEE ,0z5aHn9UTj2vgECcrEKBv0,1487832823952203776,2022-01-30 16:59:22+00:00,,,,,,,
-31,theorypoppins,"kind of like this a lot actually  was very disoriented for that mv, but i like this song ",0YQEWdfq3ajtNtK106Dr0k,1487829833065406475,2022-01-30 16:47:29+00:00,0.0,0.0,0.6333415,0.0,0.2707955,0.0,0.8074265
-32,theorypoppins,it's so so good ,3hgOyrjBko4gPQRCZjedDU,1487826884113186819,2022-01-30 16:35:46+00:00,0.0,0.0,0.4402175,0.2848695,0.343884,0.0,0.0
-33,theorypoppins,and on that note everyone go stream ,1XxT5GxDa5GD8hnhTK2AD6,1487823493270016011,2022-01-30 16:22:17+00:00,,,,,,,
-34,theorypoppins,maybe the french were on to something here  ,5h9OvsTeNydBaZp7swQubV,1487822986300334081,2022-01-30 16:20:17+00:00,0.0,0.0,0.3952125,0.0,0.381178,0.0,0.936871
-35,theorypoppins,"why is this one of Chaeyoung's best raps also their voices on this, very gorgeous  ",7AqScxClmkJdqHZjWSkKH8,1487817410736529410,2022-01-30 15:58:07+00:00,0.0,0.0,0.7660296666666667,0.0,0.18669933333333333,0.2425993333333333,0.32047033333333336
+0,Iovingitt,...... if u get it u get it ,0oiQqWcpJVeMsKQ5E0Cil8,1488495932190740486,2022-02-01 12:54:19+00:00,,,,,,,
+1,Iovingitt,this song had me throwing up.. so fucking good ,5FX1jzf7IkolzAcCM3ATAJ,1488494854380339202,2022-02-01 12:50:02+00:00,0.4976326666666666,0.0,0.298454,0.0,0.23526133333333332,0.0,0.0
+2,Iovingitt,Started throwing up its too good ,2wj2Mh7Zmp036eH1aY6nAW,1487723210317697028,2022-01-30 09:43:48+00:00,,,,,,,
+3,Iovingitt,the 3rd gen bg music serve ,3zmrdOtnOogqLllz26WLZ3,1487721115917201416,2022-01-30 09:35:29+00:00,,,,,,,
+4,Iovingitt,the last chorus where they go ooh-ooh in the bg yeah i cried  ,4ZhE2dQ2MqEgWAgPnKWfhj,1487720016489418754,2022-01-30 09:31:07+00:00,0.0,0.618808,0.0,0.0,0.0,0.0,0.0
+5,Iovingitt,tectonic plates shifted ,0Fj5sQ4V4fYGVOxkoNUxz1,1487718761771720706,2022-01-30 09:26:07+00:00,,,,,,,
+6,Iovingitt,one of their best bsides i think ,1lWoDFIoclXSdMF9g8tjPY,1487717418134917122,2022-01-30 09:20:47+00:00,0.0,0.0,0.307436,0.181316,0.26727566666666663,0.0,0.29646333333333336
+7,Iovingitt,TURN THAT SHIT UP! ,2FHqVel9e7MZc1GNPEMtub,1487363573621960706,2022-01-29 09:54:44+00:00,0.861681,0.0,0.0,0.0,0.0,0.0,0.0
+8,Iovingitt,we were all so happy this day ,4M58f8RgOr3jr5ccG6hRTb,1487359203211677702,2022-01-29 09:37:22+00:00,0.0,0.0,0.953568,0.0,0.0,0.460625,0.0
+9,Wppp_jp_music,TONE Ema / UNITE SATISFY  #spotify #NowPlaying,7Cmc7lswGW9IWX61ZGIYLr,1488495869376696325,2022-02-01 12:54:04+00:00,0.0,0.0,0.899068,0.0,0.0,0.0,0.0
+10,Wppp_jp_music,Flow of energy (Extended Mix) / MGRAW  #NowPlaying,7qNGrjFQVgto5E3pRLIRas,1488405218312466434,2022-02-01 06:53:51+00:00,0.0,0.0,0.652268,0.0,0.0,0.0,0.0
+11,Wppp_jp_music,Time to say goodbye(Con te Partiro) - Instrumental Cover  ,3Ez44qomtiyRQLU9wZTJPo,1488208898154983424,2022-01-31 17:53:45+00:00,0.0,0.0,0.0,0.584034,0.0,0.0,0.0
+12,Wppp_jp_music,GRATEC MOUR EDEN  #NowPlaying,0NZtutWM1o0tTVcDSvXyFm,1488178770234441734,2022-01-31 15:54:02+00:00,,,,,,,
+13,Wppp_jp_music,"GRATEC MOUR,Rising Day feat. Satan (Long ver.)  #spotify",2OxlowDDMKEVMIQwEQideV,1488163639089860608,2022-01-31 14:53:54+00:00,0.0,0.0,0.786842,0.0,0.0,0.0,0.0
+14,Wppp_jp_music,Next Dimension-script 1 (Radio Mix) /MGRAW  #NowPlaying,3FybDJ429yWuQ811jYXdMk,1488148527733563392,2022-01-31 13:53:52+00:00,,,,,,,
+15,Wppp_jp_music,monochrome - GM  #spotify #NowPlaying,5k8hNmeTuhOZ6y86m4f61C,1488133424774746114,2022-01-31 12:53:51+00:00,0.0,0.0,0.7331965,0.0,0.0,0.0,0.0
+16,Wppp_jp_music,Airport Terminal / Acapella royalty free-Wet-bpm168 / DaNINKS  ,5m3aWBCJ1R67U0cbgpvVv9,1487876696133214208,2022-01-30 19:53:42+00:00,0.0,0.0,0.53967,0.0,0.0,0.0,0.0
+17,Wppp_jp_music, Heart smile  (A Gift from Bali)  #spotify,1QF83EgGIPqAaVDd2XdQd1,1487786185976352768,2022-01-30 13:54:03+00:00,0.0,0.0,0.854599,0.0,0.0,0.0,0.0
+18,Wppp_jp_music,"GRATEC MOUR,Rising Day feat. Satan (Long ver.)  #spotify",2OxlowDDMKEVMIQwEQideV,1487710589749456897,2022-01-30 08:53:39+00:00,0.0,0.0,0.6557065,0.0,0.0,0.0,0.0
+19,Wppp_jp_music,MGRAW Iron Man No.3 (Extended Mix)  #NowPlaying,2tofhQi2KUYYghf0loYDdx,1487620105609498625,2022-01-30 02:54:06+00:00,,,,,,,
+20,Wppp_jp_music,STRAY SHEEP / SLAKE &amp; RAM  #spotify #NowPlaying,1zBwic6P4yyY5IrcUQFGbG,1487393535746011137,2022-01-29 11:53:48+00:00,,,,,,,
+21,Wppp_jp_music,GRATEC MOUR Rising Day feat. Satan (Long ver.)  #NowPlaying,2OxlowDDMKEVMIQwEQideV,1487197270580019202,2022-01-28 22:53:54+00:00,0.0,0.0,0.7593915,0.0,0.0,0.0,0.0
+22,Wppp_jp_music,MGRAW anemos (Radio Mix)  #NowPlaying,5ZATExz2ASn1CpclGQd6Yz,1487151919697379329,2022-01-28 19:53:42+00:00,,,,,,,
+23,Wppp_jp_music,DREAMIN OF YOU ft.kttur  (Remix Ver.)/Arts Of Collective ,2UDz645lySY4x24I3HoHUn,1487091507769212935,2022-01-28 15:53:38+00:00,0.0,0.0,0.56841,0.0,0.0,0.0,0.0
+24,Wppp_jp_music,"GRATEC MOUR,Rising Day feat. Satan (Long ver.)  #spotify",2OxlowDDMKEVMIQwEQideV,1487076493662380043,2022-01-28 14:53:59+00:00,0.0,0.0,0.786842,0.0,0.0,0.0,0.0
+25,Wppp_jp_music,TONE Ema / UNITE SATISFY  #spotify #NowPlaying,7Cmc7lswGW9IWX61ZGIYLr,1487046311710920706,2022-01-28 12:54:03+00:00,0.0,0.0,0.0,0.0,0.920855,0.0,0.0
+26,Wppp_jp_music,Flow of energy (Extended Mix) / MGRAW  #NowPlaying,7qNGrjFQVgto5E3pRLIRas,1486985832506408960,2022-01-28 08:53:43+00:00,0.0,0.0,0.6101315,0.0,0.0,0.0,0.0
+27,Wppp_jp_music,monochrome - GM  #spotify #NowPlaying,5k8hNmeTuhOZ6y86m4f61C,1486955725419335680,2022-01-28 06:54:05+00:00,,,,,,,
+28,Wppp_jp_music,Gram N.T.T.D (No Time To Die )  #spotify #NowPlaying,0VqbxzLN5Moo50vujQnhpE,1486940530273812480,2022-01-28 05:53:43+00:00,0.0,0.0,0.0,0.929247,0.0,0.0,0.0
+29,Wppp_jp_music,Flowing Freedom / MGRAW  #spotify #NowPlaying,55DxaAC5AbSeQdsgVuyYGh,1486910446523150342,2022-01-28 03:54:10+00:00,0.0,0.0,0.6415053333333334,0.0,0.0,0.0,0.0
+30,Wppp_jp_music,Hybreath / UNITE SATISFY  #spotify,6jiL63XBrkutq7o6dJcnkC,1486819768845811712,2022-01-27 21:53:51+00:00,0.0,0.0,0.0,0.0,0.920855,0.0,0.0
+31,Wppp_jp_music,Let It Snow! Let It Snow! Let It Snow! - Instrumental Cover  ,4q9mgZE4tp2y1RBjfediIT,1486729263877595139,2022-01-27 15:54:13+00:00,0.0,0.0,0.0,0.0,0.875612,0.0,0.0
+32,Wppp_jp_music,Gram N.T.T.D (No Time To Die )  #spotify #NowPlaying,0VqbxzLN5Moo50vujQnhpE,1486714013224665091,2022-01-27 14:53:37+00:00,0.0,0.0,0.0,0.929247,0.0,0.0,0.0
+33,Wppp_jp_music,Anywhere Is  - Instrumental Cover   #spotify,7xmdBe1X95SrDHcL8aSs5S,1486683820346642433,2022-01-27 12:53:38+00:00,0.0,0.0,0.48234666666666665,0.0,0.0,0.0,0.31995999999999997
+34,Wppp_jp_music,DREAMIN OF YOU ft.kttur (Long Ver.) /Arts Of Collective  ,5majwTeGcaTBuYSKZ7oVHO,1486608448012034049,2022-01-27 07:54:08+00:00,,,,,,,
+35,Wppp_jp_music,Christmas Eve - Instrumental Cover   #spotify,6HhoUKaNlaPKkgJM8UX1pF,1486593338149322756,2022-01-27 06:54:06+00:00,0.0,0.0,0.547625,0.0,0.0,0.0,0.0
+36,Wppp_jp_music,Change the World(Instrumental Cover)   #spotify,1XWrF5GBt7RU66CNjkVlwH,1486548060779933697,2022-01-27 03:54:11+00:00,0.0,0.0,0.553091,0.0,0.0,0.0,0.0
+37,Wppp_jp_music,Bubble Wrap (Remaster Extended Mix) / MGRAW  #spotify #NowPlaying,7iLofxihDQMlNqUXQwh68s,1486532887252205570,2022-01-27 02:53:53+00:00,,,,,,,
+38,Wppp_jp_music,TONE Ema / UNITE SATISFY  #spotify #NowPlaying,7Cmc7lswGW9IWX61ZGIYLr,1486502670689247237,2022-01-27 00:53:49+00:00,,,,,,,
+39,Wppp_jp_music,DREAMIN OF YOU ft.kttur (Long Ver.) /Arts Of Collective  ,5majwTeGcaTBuYSKZ7oVHO,1486457340907769860,2022-01-26 21:53:41+00:00,,,,,,,
+40,Wppp_jp_music,Kaym BEAT EMOTION  #NowPlaying,5qVv4dTs5eSzHHhKjFLApF,1486412037299503105,2022-01-26 18:53:40+00:00,,,,,,,
+41,Wppp_jp_music,RAM Another Essence (Long Ver.)  #spotify #NowPlaying,68Y4S3M3SZOjWGGijgIWrW,1486396929911451648,2022-01-26 17:53:38+00:00,0.0,0.0,0.4394775,0.0,0.495868,0.0,0.0
+42,Wppp_jp_music,MGRAW anemos (Radio Mix)  #NowPlaying,5ZATExz2ASn1CpclGQd6Yz,1486155389079265281,2022-01-26 01:53:50+00:00,,,,,,,
+43,Wppp_jp_music,TONE A.I. / UNITE SATISFY  #spotify #NowPlaying,0xgT8h7JT5meE1MqVZq6xB,1486079853552349186,2022-01-25 20:53:41+00:00,,,,,,,
+44,Wppp_jp_music,RAM Resonance (Remix Ver.)  #spotify #NowPlaying,4vvxntCp87GzTyjaKBoe7N,1486064748735000579,2022-01-25 19:53:40+00:00,0.0,0.0,0.737294,0.0,0.0,0.0,0.0
+45,Wppp_jp_music,RAM Resonance (Remix Ver.)  #spotify #NowPlaying,4vvxntCp87GzTyjaKBoe7N,1485928897057533958,2022-01-25 10:53:50+00:00,,,,,,,
+46,Wppp_jp_music,Flow of energy (Extended Mix) / MGRAW  #NowPlaying,7qNGrjFQVgto5E3pRLIRas,1485913793591132160,2022-01-25 09:53:49+00:00,0.0,0.0,0.652268,0.0,0.0,0.0,0.0
+47,Wppp_jp_music,S.T.E - RAM  #spotify,2bxTL8NJpflLqfpSgknj3w,1485793020322926593,2022-01-25 01:53:55+00:00,,,,,,,
+48,Wppp_jp_music,Flowing Freedom / MGRAW  #spotify #NowPlaying,55DxaAC5AbSeQdsgVuyYGh,1485777908689866753,2022-01-25 00:53:52+00:00,0.0,0.0,0.669173,0.0,0.0,0.0,0.0
+49,Wppp_jp_music,GRATEC MOUR Planet Nine  #NowPlaying,2wFgvGmTpCAxlxbwTAATEu,1485732561909592064,2022-01-24 21:53:40+00:00,0.0,0.0,0.53967,0.0,0.0,0.0,0.0
+50,Wppp_jp_music,MGRAW Iron Man No.3 (Extended Mix)  #NowPlaying,2tofhQi2KUYYghf0loYDdx,1485642096300429316,2022-01-24 15:54:12+00:00,0.0,0.0,0.50975,0.0,0.0,0.0,0.0

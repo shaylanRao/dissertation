@@ -32,7 +32,6 @@ def sentence_analyser(item):
 
 
 def get_text_senti(text):
-    print(text)
     label_df = pd.DataFrame(columns=COLUMN_HEADINGS)
     # if parameter us empty
     if text == "":
