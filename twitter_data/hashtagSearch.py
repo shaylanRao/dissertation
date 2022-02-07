@@ -9,7 +9,7 @@ from numpy import int64
 
 import pandas as pd
 
-from classification.classification import Classifier, KernelSvc
+from classification.classification import Classifier, KernelSvc, KNearestNeighbour
 from sentiment.lyric_sentiment import get_lyrics_senti
 from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
@@ -262,15 +262,23 @@ def classify_data():
     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
     data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time', ])
     # display(data_to_graph)
+
+    # Get lyrical data
     data_to_graph = get_lyric_sentiment(data_to_graph)
+
+    # Saves data to csv
     data_to_graph.to_csv('datatoclassify.csv')
+
     print(mode_user_name, "'s ", "Data Size: ", len(data_to_graph))
 
     # classifier = Classifier(data_to_graph, "joy")
     # classifier.classify()
 
-    svm_classify = KernelSvc(data_to_graph, "joy")
-    svm_classify.drive()
+    # svm_classify = KernelSvc(data_to_graph, "joy")
+    # svm_classify.drive()
+
+    knn_classify = KNearestNeighbour(data_to_graph, "joy")
+    knn_classify.drive()
 
 
 def get_max_songlist():
@@ -316,7 +324,7 @@ def _main_():
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
-    # Open csv and put into s_tweets
+    # Open csv and put into s_tweetsd
     read_s_tweet_file("s_tweets_trial.csv")
 
     # Gets the largest list of songs
@@ -325,7 +333,7 @@ def _main_():
     # Graphs the largest song list
     # graph_one_playlist(max_list)
 
-    get_heatmap()
+    # get_heatmap()
     classify_data()
 
     # --Outdated--

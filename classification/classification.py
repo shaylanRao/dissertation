@@ -1,10 +1,12 @@
 import math
-
+import seaborn as sns
 import numpy as np
 import pandas
 import pandas as pd
 from IPython.core.display import display
-from sklearn.metrics import confusion_matrix, classification_report
+from matplotlib import pyplot as plt
+from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
 
@@ -48,14 +50,16 @@ class Classifier:
         track_list = self.user_data['track_id'].tolist()
         # Gets the all the musical features of each song
         track_features = get_all_music_features(track_list)
+        # Merges track features to the track and other data
         self.user_data = pd.concat([self.user_data, track_features], axis=1)
         # self.user_data.to_csv('userdata.csv')
+        # Gets the size of the overall dataframe
+        df_size = self.user_data.shape[1]
         # Randomizes rows
         shuffled_data = self.user_data.sample(frac=1)
-        # Sets music components as data
-        self.set_train_test_data(shuffled_data.iloc[:, 16:])
-        # Sets music components and lyrical sentiment as data
-        # self.set_train_test_data(shuffled_data.iloc[:, 9:])
+        # Sets music components as data (and includes lyrical data if any is present)
+        # (10 represents the number of music features)
+        self.set_train_test_data(shuffled_data.iloc[:, df_size-10:])
 
         # and anger to tentative as labels
         self.set_train_test_labels(shuffled_data.iloc[:, 2:9])
@@ -95,7 +99,8 @@ class Classifier:
         # Transform both data
         self.train_data = pca.transform(self.train_data)
         self.test_data = pca.transform(self.test_data)
-        # print(np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4) * 100))
+        print("Originality per dimension increase")
+        print(np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4) * 100))
 
     # --- Different models ---
     # Logistic regression modeling
@@ -216,3 +221,32 @@ class KernelSvc(Classifier):
 
 class KernelSVM(Classifier):
     def drive(self):
+        pass
+
+
+class KNearestNeighbour(Classifier):
+    def drive(self):
+        print("This is KNN:")
+        self.prep_data()
+        self.knn()
+        self.correlation_graph()
+
+    def knn(self):
+        knn_model = KNeighborsRegressor(n_neighbors=3)
+        knn_model.fit(self.train_data, self.train_lbl)
+        test_preds = knn_model.predict(self.test_data)
+        mse = mean_squared_error(self.test_lbl, test_preds)
+        rmse = math.sqrt(mse)
+        print(rmse)
+        self.plot_model(test_preds)
+
+    def plot_model(self, test_preds):
+        cmap = sns.cubehelix_palette(as_cmap=True)
+        f, ax = plt.subplots()
+        points = ax.scatter(self.test_data['energy'], self.test_data['loudness'], c=test_preds, s=50, cmap=cmap)
+        f.colorbar(points)
+        plt.show()
+
+    def correlation_graph(self):
+        corr_matrix = self.test_data.corr()
+        display(corr_matrix["energy"])
