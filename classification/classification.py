@@ -6,6 +6,7 @@ import pandas as pd
 from IPython.core.display import display
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error
+from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
@@ -15,7 +16,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
 
 
-class Classifier:
+class LinLogReg:
     def __init__(self, data, emotion):
         self.user_data = data
         self.EMOTION = emotion
@@ -48,18 +49,25 @@ class Classifier:
     def prep_data(self):
         # Gets the list of tracks from the user
         track_list = self.user_data['track_id'].tolist()
+
         # Gets the all the musical features of each song
         track_features = get_all_music_features(track_list)
+
         # Merges track features to the track and other data
         self.user_data = pd.concat([self.user_data, track_features], axis=1)
         # self.user_data.to_csv('userdata.csv')
+
         # Gets the size of the overall dataframe
         df_size = self.user_data.shape[1]
+
         # Randomizes rows
         shuffled_data = self.user_data.sample(frac=1)
+
         # Sets music components as data (and includes lyrical data if any is present)
         # (10 represents the number of music features)
         self.set_train_test_data(shuffled_data.iloc[:, df_size-10:])
+        # Sets music data to also include lyrical sentiment
+        # self.set_train_test_data(shuffled_data.iloc[:, df_size-17:])
 
         # and anger to tentative as labels
         self.set_train_test_labels(shuffled_data.iloc[:, 2:9])
@@ -99,8 +107,8 @@ class Classifier:
         # Transform both data
         self.train_data = pca.transform(self.train_data)
         self.test_data = pca.transform(self.test_data)
-        print("Originality per dimension increase")
-        print(np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4) * 100))
+        # print("Originality per dimension increase")
+        # print(np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4) * 100))
 
     # --- Different models ---
     # Logistic regression modeling
@@ -185,7 +193,7 @@ class Classifier:
         self.ridge_reg_classifier()
 
 
-class KernelSvc(Classifier):
+class KernelSVC(LinLogReg):
     def drive(self):
         self.prep_data()
         self.standardizer()
@@ -219,27 +227,31 @@ class KernelSvc(Classifier):
         print(classification_report(self.get_log_data_labels(self.test_lbl), y_pred))
 
 
-class KernelSVM(Classifier):
+class KernelSVM(LinLogReg):
     def drive(self):
         pass
 
 
-class KNearestNeighbour(Classifier):
+class KNeighborRegressor(LinLogReg):
     def drive(self):
-        print("This is KNN:")
+        print("This is KNR:")
         self.prep_data()
-        self.knn()
-        self.correlation_graph()
+        self.standardizer()
+        self.prin_comp()
+        best_params = self.grid_search()
+        self.knr(best_params['n_neighbors'], best_params['leaf_size'], best_params['weights'])
+        # self.correlation_graph()
 
-    def knn(self):
-        knn_model = KNeighborsRegressor(n_neighbors=3)
-        knn_model.fit(self.train_data, self.train_lbl)
-        test_preds = knn_model.predict(self.test_data)
+    def knr(self, k_num, leaf_sz, weight):
+        knr_model = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
+        knr_model.fit(self.train_data, self.train_lbl)
+        test_preds = knr_model.predict(self.test_data)
         mse = mean_squared_error(self.test_lbl, test_preds)
         rmse = math.sqrt(mse)
         print(rmse)
-        self.plot_model(test_preds)
+        # self.plot_model(test_preds)
 
+    # Testing to see correlation for energy and loudness and prediction on colorbar
     def plot_model(self, test_preds):
         cmap = sns.cubehelix_palette(as_cmap=True)
         f, ax = plt.subplots()
@@ -247,6 +259,15 @@ class KNearestNeighbour(Classifier):
         f.colorbar(points)
         plt.show()
 
+    # Testing to see correlation for energy and prediction
     def correlation_graph(self):
         corr_matrix = self.test_data.corr()
         display(corr_matrix["energy"])
+
+    # Tuning
+    def grid_search(self):
+        parameters = {"n_neighbors": range(1, 20), 'weights': ['uniform', 'distance'], "leaf_size": range(1, 30)}
+        gridsearch = GridSearchCV(KNeighborsRegressor(), parameters)
+        gridsearch.fit(self.train_data, self.train_lbl)
+        return gridsearch.best_params_
+

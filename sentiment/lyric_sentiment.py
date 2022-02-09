@@ -2,6 +2,7 @@ import requests
 from IPython.core.display import display
 from bs4 import BeautifulSoup
 import re
+import unidecode
 
 from sentiment.sentiment_analyser import get_l_senti
 
@@ -28,4 +29,5 @@ def clean_name(name):
     name = name.replace("'", "")
     name = re.sub("[\(\[].*?[\)\]]", "", name)
     name = re.sub(r'-$','', name)
+    name = unidecode.unidecode(name)
     return name.lower()

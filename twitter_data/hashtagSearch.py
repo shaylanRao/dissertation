@@ -9,7 +9,7 @@ from numpy import int64
 
 import pandas as pd
 
-from classification.classification import Classifier, KernelSvc, KNearestNeighbour
+from classification.classification import LinLogReg, KernelSVC, KNeighborRegressor
 from sentiment.lyric_sentiment import get_lyrics_senti
 from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
@@ -271,14 +271,26 @@ def classify_data():
 
     print(mode_user_name, "'s ", "Data Size: ", len(data_to_graph))
 
-    # classifier = Classifier(data_to_graph, "joy")
+    # classifier = LinLogReg(data_to_graph, "joy")
     # classifier.classify()
 
-    # svm_classify = KernelSvc(data_to_graph, "joy")
+    # svm_classify = KernelSVC(data_to_graph, "joy")
     # svm_classify.drive()
+    print("joy")
+    knr_joy = KNeighborRegressor(data_to_graph, "joy")
+    knr_joy.drive()
 
-    knn_classify = KNearestNeighbour(data_to_graph, "joy")
-    knn_classify.drive()
+    print('sadness')
+    knr_joy = KNeighborRegressor(data_to_graph, "sadness")
+    knr_joy.drive()
+
+    print('anger')
+    knr_joy = KNeighborRegressor(data_to_graph, "anger")
+    knr_joy.drive()
+
+    print('fear')
+    knr_joy = KNeighborRegressor(data_to_graph, "fear")
+    knr_joy.drive()
 
 
 def get_max_songlist():
