@@ -5,13 +5,15 @@ import pandas
 import pandas as pd
 from IPython.core.display import display
 from matplotlib import pyplot as plt
+from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
 from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
 
-from spotipy_section.graphPlaylist import get_all_music_features, ALL_FEATURE_LABELS, view_scatter_graph
+from spotipy_section.graphPlaylist import get_all_music_features, ALL_FEATURE_LABELS, view_scatter_graph, \
+    get_song_list_ids
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
 
@@ -31,6 +33,10 @@ class LinLogReg:
     train_data = pandas.Series
     test_data = pandas.Series
 
+    scalar = None
+    pca_model = None
+    predict_playlist_data = None
+
     # General PCA
     # def standardizer(df):
     #     x = df.loc[:, ALL_FEATURE_LABELS].values
@@ -47,6 +53,7 @@ class LinLogReg:
 
     # --- formatting training data and test data for modeling ---
     def prep_data(self):
+        # get_playlist_data()
         # Gets the list of tracks from the user
         track_list = self.user_data['track_id'].tolist()
 
@@ -66,6 +73,7 @@ class LinLogReg:
         # Sets music components as data (and includes lyrical data if any is present)
         # (10 represents the number of music features)
         self.set_train_test_data(shuffled_data.iloc[:, df_size-10:])
+
         # Sets music data to also include lyrical sentiment
         # self.set_train_test_data(shuffled_data.iloc[:, df_size-17:])
 
@@ -88,21 +96,24 @@ class LinLogReg:
 
     # --- PCA (for use on ML techniques) ---
     def standardizer(self):
-        # define scaler
-        scaler = StandardScaler()
+        # define scalar
+        scalar = StandardScaler()
 
         # fit scalar to training data only
-        scaler.fit(self.train_data)
+        scalar.fit(self.train_data)
+        self.scalar = scalar
 
         # Transform both datasets
-        self.train_data = scaler.transform(self.train_data)
-        self.test_data = scaler.transform(self.test_data)
+        self.train_data = scalar.transform(self.train_data)
+        self.test_data = scalar.transform(self.test_data)
 
     # PCA function
     def prin_comp(self):
         # Keeps the relevant number of components to ensure 95% of original data is preserved
         pca = PCA(self.DATA_PRESERVED)
         pca.fit(self.train_data)
+
+        self.pca_model = pca
 
         # Transform both data
         self.train_data = pca.transform(self.train_data)
@@ -227,7 +238,8 @@ class KernelSVC(LinLogReg):
         print(classification_report(self.get_log_data_labels(self.test_lbl), y_pred))
 
 
-class KernelSVM(LinLogReg):
+# TODO
+class KernelSVR(LinLogReg):
     def drive(self):
         pass
 
@@ -239,17 +251,37 @@ class KNeighborRegressor(LinLogReg):
         self.standardizer()
         self.prin_comp()
         best_params = self.grid_search()
-        self.knr(best_params['n_neighbors'], best_params['leaf_size'], best_params['weights'])
+        bagging_model = self.knr_bagging(best_params['n_neighbors'], best_params['leaf_size'], best_params['weights'])
+        return bagging_model, self.scalar, self.pca_model
         # self.correlation_graph()
 
-    def knr(self, k_num, leaf_sz, weight):
-        knr_model = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
-        knr_model.fit(self.train_data, self.train_lbl)
-        test_preds = knr_model.predict(self.test_data)
+    def knr_bagging(self, k_num, leaf_sz, weight):
+        print("Bagged model:")
+        # Initialises KNR using optimal parameters
+        bagged_knr = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
+        # Uses bagging to improve model
+        bagging_model = BaggingRegressor(bagged_knr, n_estimators=100)
+        # Fits the bagged model to the training data with labels
+        bagging_model.fit(self.train_data, self.train_lbl)
+        # Makes predictions on test data using fitted model
+        test_preds = bagging_model.predict(self.test_data)
+        # Calculates mean squared error on test data
         mse = mean_squared_error(self.test_lbl, test_preds)
         rmse = math.sqrt(mse)
         print(rmse)
-        # self.plot_model(test_preds)
+        # make prediction on playlist data
+        return bagging_model
+        # self.knr_boosting()
+
+    # Boosting regressor instead of KNR and Bagging
+    # def knr_boosting(self):
+    #     print("Boost model:")
+    #     boost_model = GradientBoostingRegressor(random_state=0)
+    #     boost_model.fit(self.train_data, self.train_lbl)
+    #     test_preds = boost_model.predict(self.test_data)
+    #     mse = mean_squared_error(self.test_lbl, test_preds)
+    #     rmse = math.sqrt(mse)
+    #     print(rmse)
 
     # Testing to see correlation for energy and loudness and prediction on colorbar
     def plot_model(self, test_preds):
@@ -266,8 +298,14 @@ class KNeighborRegressor(LinLogReg):
 
     # Tuning
     def grid_search(self):
-        parameters = {"n_neighbors": range(1, 20), 'weights': ['uniform', 'distance'], "leaf_size": range(1, 30)}
+        # Define range to test for parameters
+        parameters = {"n_neighbors": range(2, 20), 'weights': ['uniform', 'distance'], "leaf_size": range(1, 30)}
         gridsearch = GridSearchCV(KNeighborsRegressor(), parameters)
+        # Find the parameters for the given data
         gridsearch.fit(self.train_data, self.train_lbl)
+        # Returns the optimal parameters for the training data
         return gridsearch.best_params_
 
+
+class DecisionTree(LinLogReg):
+    pass
