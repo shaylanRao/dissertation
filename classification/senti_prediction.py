@@ -19,7 +19,7 @@ class EmotionModel:
 
 # Gets prepared data from playlist in this method
 def get_playlist_data(emotion_model):
-    track_list = get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo')
+    track_list = get_song_list_ids('5ugRWc6JSXeDOny8WolH2g')
     tracks_features = get_all_music_features(track_list)
 
     tracks_features = emotion_model.scalar.transform(tracks_features)
@@ -50,7 +50,7 @@ class Prediction:
 
     def graph(self):
         # TODO clean up limit of graph x axis
-        x = range(1, len(get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo')) + 1)
+        x = range(1, len(get_song_list_ids('5ugRWc6JSXeDOny8WolH2g')) + 1)
         j, f, a, s = map(list, zip(*sorted(zip(self.joy_pred, self.fear_pred, self.anger_pred, self.sadness_pred))))
         fig = plt.figure()
         ax = fig.add_subplot()

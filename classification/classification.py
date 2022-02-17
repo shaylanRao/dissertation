@@ -5,13 +5,13 @@ import pandas
 import pandas as pd
 from IPython.core.display import display
 from matplotlib import pyplot as plt
-from sklearn import tree
 from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
 from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
+from sklearn.tree import DecisionTreeRegressor
 
 from spotipy_section.graphPlaylist import get_all_music_features, ALL_FEATURE_LABELS, view_scatter_graph, \
     get_song_list_ids
@@ -73,7 +73,7 @@ class LinLogReg:
 
         # Sets music components as data (and includes lyrical data if any is present)
         # (10 represents the number of music features)
-        self.set_train_test_data(shuffled_data.iloc[:, df_size-10:])
+        self.set_train_test_data(shuffled_data.iloc[:, df_size - 10:])
 
         # Sets music data to also include lyrical sentiment
         # self.set_train_test_data(shuffled_data.iloc[:, df_size-17:])
@@ -219,12 +219,13 @@ class LinLogReg:
         print(rmse)
         print("")
 
-        print("R2 Score")
+        print("R2 Score:")
         print(r2)
         print("")
 
-        print("Correlation matrix")
-        display(corr_matrix[self.EMOTION])
+        # print("Correlation matrix:")
+        # display(corr_matrix[self.EMOTION])
+        print("----------------------------------")
         print("")
 
 
@@ -274,7 +275,10 @@ class KNeighborRegressor(LinLogReg):
         self.prep_data()
         self.standardizer()
         self.prin_comp()
-        best_params = self.grid_search()
+        max_n = math.floor(len(self.train_data) * (4 / 5))
+        best_params = self.grid_search(KNeighborsRegressor(),
+                                       {"n_neighbors": range(2, max_n), 'weights': ['uniform', 'distance'],
+                                        "leaf_size": range(15, 30)})
         bagging_model = self.knr_bagging(best_params['n_neighbors'], best_params['leaf_size'], best_params['weights'])
         return bagging_model, self.scalar, self.pca_model
         # self.correlation_graph()
@@ -314,18 +318,17 @@ class KNeighborRegressor(LinLogReg):
         plt.show()
 
     # Tuning
-    def grid_search(self):
-        max_n = math.floor(len(self.train_data)*(4/5))
+    def grid_search(self, model, params):
         # Define range to test for parameters
-        parameters = {"n_neighbors": range(2, max_n), 'weights': ['uniform', 'distance'], "leaf_size": range(15, 30)}
-        gridsearch = GridSearchCV(KNeighborsRegressor(), parameters)
+        parameters = params
+        gridsearch = GridSearchCV(model, parameters)
         # Find the parameters for the given data
         gridsearch.fit(self.train_data, self.train_lbl)
         # Returns the optimal parameters for the training data
         return gridsearch.best_params_
 
 
-class DecisionTree(LinLogReg):
+class DecisionTree(KNeighborRegressor):
     def drive(self):
         print("Dec Tree Reg ", self.EMOTION, ":")
         self.prep_data()
@@ -336,8 +339,33 @@ class DecisionTree(LinLogReg):
         # self.correlation_graph()
 
     def decision_tree_regressor(self):
-        dec_tree = tree.DecisionTreeRegressor()
-        dec_tree = dec_tree.fit(self.train_data, self.train_lbl)
-        test_preds = dec_tree.predict(self.test_data)
+        parameters = {"splitter": ["best", "random"],
+                      "max_depth": [3, 5, 7, 9],
+                      "min_samples_leaf": [1, 2, 3, 4, 5],
+                      "min_weight_fraction_leaf": [0.1, 0.2, 0.3, 0.4],
+                      "max_features": ["auto", "log2", "sqrt", None],
+                      "max_leaf_nodes": [None, 10, 20, 30, 40, 50]}
+
+        # dec_tree = DecisionTreeRegressor()
+        # dec_tree = dec_tree.fit(self.train_data, self.train_lbl)
+        # test_preds = dec_tree.predict(self.test_data)
+        # print("dec tree score")
+        # print(dec_tree.score(self.test_data, self.test_lbl))
+
+        # if self.EMOTION == "joy":
+            # sns.distplot(test_preds)
+        best_params = self.grid_search(DecisionTreeRegressor(), parameters)
+        # print(best_params)
+        tuned_dec_tree = DecisionTreeRegressor(max_depth=best_params['max_depth'],
+                                               max_features=best_params['max_features'],
+                                               max_leaf_nodes=best_params['max_leaf_nodes'],
+                                               min_samples_leaf=best_params['min_samples_leaf'],
+                                               min_weight_fraction_leaf=best_params['min_weight_fraction_leaf'],
+                                               splitter=best_params['splitter'])
+        tuned_dec_tree = tuned_dec_tree.fit(self.train_data, self.train_lbl)
+        print("tuned dec tree score")
+        print(tuned_dec_tree.score(self.test_data, self.test_lbl))
+        test_preds = tuned_dec_tree.predict(self.test_data)
+
         self.evaluate_model(test_preds)
-        return dec_tree
+        return tuned_dec_tree
