@@ -16,7 +16,6 @@ from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
 from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
 from twitter_data import innit_tweepy
 
-
 api = innit_tweepy.get_tweepy_api()
 
 CHOICE = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets'
@@ -30,7 +29,8 @@ all_s_tweets = pd.DataFrame(columns=TWEET_COLUMN__NAMES)
 # Defined in sentiment_analyser.py
 label_df = pd.DataFrame(columns=COLUMN_HEADINGS)
 
-BLACKLIST = ['BBC3MusicBot', 'BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777', 'bieberonspotify',
+BLACKLIST = ['BBC3MusicBot', 'BBCR6MusicBot', 'BBC2MusicBot', 'KiddysplaceMx', 'Spotweefy', 'JohnOxley777',
+             'bieberonspotify',
              'LiveMixPlay', 'CAA_Official', 'fabclaxton', 'THXJRT', 'moevazquez']
 
 NUM_USERS = 10
@@ -39,6 +39,7 @@ NUM_BEFORE_TWEETS = 3
 S_TWEET_MIN_NUM = 6
 
 FILE_NAME = 's_tweets_trial.csv'
+CHOSEN_USER = ""
 
 # Gets recent tweets which include spotify links,  .items(n) -> how many different users will be searched
 recent_s_tweets = tweepy.Cursor(api.search_tweets, q=CHOICE, result_type='recent').items(NUM_USERS)
@@ -66,7 +67,7 @@ def init_user_list():
 
 # Gets only spotify tweets from a user - passed as string
 def get_user_s_tweets(screen_name):
-    query = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets' + " " + screen_name
+    query = '"open.spotify.com/track" lang:en exclude:replies -filter:retweets' + " from:" + screen_name
     # Gets specified number of tweets that include songs in the tweets
     spotify_tweets = tweepy.Cursor(api.search_tweets, q=query, result_type='recent').items(MAX_SONG_TWEETS)
     return spotify_tweets
@@ -198,23 +199,33 @@ def rem_blacklist():
             pass
 
 
-def create_s_tweet_df():
+def create_s_tweet_df(chosen_user):
     global all_s_tweets
-    # Creates list of users who have posted using a spotify link in their tweet
-    init_user_list()
-    # Removes users on blacklist
-    rem_blacklist()
-    for user in user_screen_name_list:
-        # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS
-        # WITH LESS - hence not always selected number of users shown in table
-        if count_iterable(get_user_s_tweets(user)) > S_TWEET_MIN_NUM:
+    global CHOSEN_USER
+    if chosen_user:
+        CHOSEN_USER = chosen_user
+        get_s_tweet(chosen_user)
+    else:
+        # Creates list of users who have posted using a spotify link in their tweet
+        init_user_list()
+        # Removes users on blacklist
+        rem_blacklist()
+        for user in user_screen_name_list:
+            # If there are more than 2 tweets that the user has made which includes a spotify track, (DIS-COUNTS USERS
+            # WITH LESS - hence not always selected number of users shown in table
+            get_s_tweet(user)
 
-            # For each tweet, extract each component and collate it in a dataframe
-            for tweet in get_user_s_tweets(user):
-                text, song_id = get_s_tweet_text_and_url(tweet)
-                if song_id != "":
-                    tabulate_s_tweets(user_name=user, text=text, track_id=song_id, tweet_id=tweet.id,
-                                      time=tweet.created_at)
+
+# Strange error where the call to get_user_s_tweets cannot be stored
+def get_s_tweet(user):
+    global all_s_tweets
+    if count_iterable(get_user_s_tweets(user)) > S_TWEET_MIN_NUM:
+        # For each tweet, extract each component and collate it in a dataframe
+        for tweet in get_user_s_tweets(user):
+            text, song_id = get_s_tweet_text_and_url(tweet)
+            if song_id != "":
+                tabulate_s_tweets(user_name=user, text=text, track_id=song_id, tweet_id=tweet.id,
+                                  time=tweet.created_at)
 
 
 def read_s_tweet_file(file_name):
@@ -258,14 +269,20 @@ def get_heatmap():
 
 def classify_data():
     data_to_graph = all_s_tweets
+    # If a row has all values N/A, anger would contain N/A, this code removes any rows with N/A for all values
     data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
+    # Removes rows which show no emotion
+    data_to_graph = data_to_graph.drop(data_to_graph[(data_to_graph.anger == 0) & (data_to_graph.fear == 0) & (data_to_graph.joy == 0) & (data_to_graph.sadness == 0)].index)
+    # Gets the user with the most records
     mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
+    # Forms array of same (mode) user data
     data_to_graph = data_to_graph.loc[data_to_graph['user_name'] == mode_user_name]
-    data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time', ])
+    # Selects relevant columns
+    data_to_graph = data_to_graph.reset_index().drop(columns=['index', 'text', 'tweet_id', 'time'])
     # display(data_to_graph)
 
     # Get lyrical data
-    data_to_graph = get_lyric_sentiment(data_to_graph)
+    # data_to_graph = get_lyric_sentiment(data_to_graph)
 
     # Saves data to csv
     data_to_graph.to_csv('datatoclassify.csv')
@@ -281,15 +298,12 @@ def classify_data():
     # svm_classify.drive()
 
     # KNR for joy and sadness
-    print("joy")
-    knr_joy = KNeighborRegressor(data_to_graph, "joy")
-    model, scaler, pca = knr_joy.drive()
     predictor = Prediction(data_to_graph)
     predictor.drive()
 
-    print('sadness')
-    knr_joy = KNeighborRegressor(data_to_graph, "sadness")
-    knr_joy.drive()
+    # print('sadness')
+    # knr_joy = KNeighborRegressor(data_to_graph, "sadness")
+    # knr_joy.drive()
 
     # print('anger')
     # knr_joy = KNeighborRegressor(data_to_graph, "anger")
@@ -303,11 +317,11 @@ def get_max_songlist():
     return max(x for x in all_song_lists)
 
 
-def trawl_data():
+def trawl_data(screen_name):
     global all_s_tweets
     global label_df
     # Creates df of tweet data
-    create_s_tweet_df()
+    create_s_tweet_df(screen_name)
     # Gets a couple of previous tweets from a user before they posted a specific song
     get_before_s_tweets()
     # Also adds labels of sentiment to each song
@@ -334,13 +348,12 @@ def _main_():
     global label_df
 
     # Gets new data from twitter and also saves into csv
-    # trawl_data()
-
+    # trawl_data("kwangyajail")
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
     # Open csv and put into s_tweetsd
-    read_s_tweet_file("s_tweets_trial.csv")
+    read_s_tweet_file(FILE_NAME)
 
     # Gets the largest list of songs
     # max_list = get_max_songlist()

@@ -46,7 +46,8 @@ def get_song_list_ids(pl_id):
     song_list_ids = []
     for song in (response['items']):
         song_list_ids.append(song['track']['id'])
-
+    # Removes any tracks that don't exist anymore
+    song_list_ids = list(filter(None, song_list_ids))
     return song_list_ids
 
 
@@ -77,10 +78,15 @@ def get_x_y_z(song_list_ids, varx, vary, varz):
 
 
 def get_all_music_features(song_list_ids):
+
     features = sp.audio_features(song_list_ids)
     df = pd.DataFrame()
     for feature_label in ALL_FEATURE_LABELS:
-        df[feature_label] = feature_list = get_attribute(features, feature_label)
+        try:
+            df[feature_label] = get_attribute(features, feature_label)
+        except AttributeError:
+            print("Track does not exist")
+
     return df
 
 

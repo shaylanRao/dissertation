@@ -5,8 +5,9 @@ import pandas
 import pandas as pd
 from IPython.core.display import display
 from matplotlib import pyplot as plt
+from sklearn import tree
 from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
-from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error
+from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
@@ -203,6 +204,29 @@ class LinLogReg:
         self.lin_reg_classifier()
         self.ridge_reg_classifier()
 
+    # Evaluating metrics for models using predictions
+    def evaluate_model(self, test_preds):
+        # Calculates mean squared error on test data
+        mse = mean_squared_error(self.test_lbl, test_preds)
+        rmse = math.sqrt(mse)
+
+        # Generates pair-wise Pearsons correlation
+        corr_matrix = self.user_data.corr()
+
+        r2 = r2_score(self.test_lbl, test_preds)
+
+        print("RSME:")
+        print(rmse)
+        print("")
+
+        print("R2 Score")
+        print(r2)
+        print("")
+
+        print("Correlation matrix")
+        display(corr_matrix[self.EMOTION])
+        print("")
+
 
 class KernelSVC(LinLogReg):
     def drive(self):
@@ -246,7 +270,7 @@ class KernelSVR(LinLogReg):
 
 class KNeighborRegressor(LinLogReg):
     def drive(self):
-        print("This is KNR:")
+        print("KNR ", self.EMOTION, ":")
         self.prep_data()
         self.standardizer()
         self.prin_comp()
@@ -256,19 +280,17 @@ class KNeighborRegressor(LinLogReg):
         # self.correlation_graph()
 
     def knr_bagging(self, k_num, leaf_sz, weight):
-        print("Bagged model:")
         # Initialises KNR using optimal parameters
         bagged_knr = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
+        print("k: ", k_num, " leaf: ", leaf_sz, " weights: ", weight)
         # Uses bagging to improve model
-        bagging_model = BaggingRegressor(bagged_knr, n_estimators=100)
+        bagging_model = BaggingRegressor(bagged_knr, n_estimators=1000)
         # Fits the bagged model to the training data with labels
         bagging_model.fit(self.train_data, self.train_lbl)
         # Makes predictions on test data using fitted model
         test_preds = bagging_model.predict(self.test_data)
-        # Calculates mean squared error on test data
-        mse = mean_squared_error(self.test_lbl, test_preds)
-        rmse = math.sqrt(mse)
-        print(rmse)
+        # Evaluates model using function
+        self.evaluate_model(test_preds)
         # make prediction on playlist data
         return bagging_model
         # self.knr_boosting()
@@ -291,15 +313,11 @@ class KNeighborRegressor(LinLogReg):
         f.colorbar(points)
         plt.show()
 
-    # Testing to see correlation for energy and prediction
-    def correlation_graph(self):
-        corr_matrix = self.test_data.corr()
-        display(corr_matrix["energy"])
-
     # Tuning
     def grid_search(self):
+        max_n = math.floor(len(self.train_data)*(4/5))
         # Define range to test for parameters
-        parameters = {"n_neighbors": range(2, 20), 'weights': ['uniform', 'distance'], "leaf_size": range(1, 30)}
+        parameters = {"n_neighbors": range(2, max_n), 'weights': ['uniform', 'distance'], "leaf_size": range(15, 30)}
         gridsearch = GridSearchCV(KNeighborsRegressor(), parameters)
         # Find the parameters for the given data
         gridsearch.fit(self.train_data, self.train_lbl)
@@ -308,4 +326,18 @@ class KNeighborRegressor(LinLogReg):
 
 
 class DecisionTree(LinLogReg):
-    pass
+    def drive(self):
+        print("Dec Tree Reg ", self.EMOTION, ":")
+        self.prep_data()
+        self.standardizer()
+        self.prin_comp()
+        dec_tree = self.decision_tree_regressor()
+        return dec_tree, self.scalar, self.pca_model
+        # self.correlation_graph()
+
+    def decision_tree_regressor(self):
+        dec_tree = tree.DecisionTreeRegressor()
+        dec_tree = dec_tree.fit(self.train_data, self.train_lbl)
+        test_preds = dec_tree.predict(self.test_data)
+        self.evaluate_model(test_preds)
+        return dec_tree
