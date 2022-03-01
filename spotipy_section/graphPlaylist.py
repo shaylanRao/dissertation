@@ -26,7 +26,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
                                                redirect_uri=REDIRECT_URL, show_dialog=True))
 
 
-def get_artist_song_name(trackid):
+def get_song_artist_name(trackid):
     track = sp.track(trackid)
     song_name = track['name']
     artist_name = track['artists'][0]['name']
@@ -78,7 +78,6 @@ def get_x_y_z(song_list_ids, varx, vary, varz):
 
 
 def get_all_music_features(song_list_ids):
-
     features = sp.audio_features(song_list_ids)
     df = pd.DataFrame()
     for feature_label in ALL_FEATURE_LABELS:
@@ -150,6 +149,7 @@ def get_recently_played():
         # time = item['played_at'].replace("T", "   ")
         # print(idx, item['track']['uri'], " – ", track['name'])
         # print(time)
+        print(item['track']['name'])
         song_id = item['track']['uri'].split(":")
         track_ids.append(song_id[2])
 
@@ -185,7 +185,6 @@ def label_heatmap(song_label_df):
     attr3 = song_label_df['fear']
 
     attr4 = song_label_df['anger']
-
 
     # interpolation_grid_2(x, y, [attr1, attr2], [vx, vy, 'emotion intensity1'])
 
@@ -329,5 +328,6 @@ def main():
     # show_graph_sample(vx, vy, vz, x1, x2, x3, y1, y2, y3, z1, z2, z3)
 
 
+# get_recently_played()
 # main()
 # graph_one_playlist(get_recently_played(), label=False)

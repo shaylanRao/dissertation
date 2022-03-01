@@ -2,7 +2,23 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from classification.classification import KNeighborRegressor, DecisionTree
-from spotipy_section.graphPlaylist import get_song_list_ids, get_all_music_features
+from spotipy_section.graphPlaylist import get_song_list_ids, get_all_music_features, get_recently_played, \
+    get_song_artist_name
+
+
+# Gets prepared data from playlist in this method
+def get_playlist_data(emotion_model):
+    # Sets the recently played songs as the track list
+    track_list = get_recently_played()
+    
+    # Sets the playlist id as the track list
+    # track_list = get_song_list_ids('0IAG5sPikOCo5nvyKJjCYo')
+
+    tracks_features = get_all_music_features(track_list)
+
+    tracks_features = emotion_model.scalar.transform(tracks_features)
+    predict_playlist_data = emotion_model.pca.transform(tracks_features)
+    return predict_playlist_data
 
 
 # An object containing the model, scalar and pca used to fit the specified emotion
@@ -15,16 +31,6 @@ class EmotionModel:
     # Makes predictions for the playlist chosen
     def predict(self):
         return self.model.predict(get_playlist_data(self))
-
-
-# Gets prepared data from playlist in this method
-def get_playlist_data(emotion_model):
-    track_list = get_song_list_ids('5ugRWc6JSXeDOny8WolH2g')
-    tracks_features = get_all_music_features(track_list)
-
-    tracks_features = emotion_model.scalar.transform(tracks_features)
-    predict_playlist_data = emotion_model.pca.transform(tracks_features)
-    return predict_playlist_data
 
 
 class Prediction:
@@ -40,6 +46,12 @@ class Prediction:
     sadness_pred = []
 
     def drive(self):
+        songlist = []
+        for track in get_recently_played():
+            song, artist = get_song_artist_name(track)
+            songlist.append(song)
+        print(songlist)
+        
         self.anger_pred = self.anger.predict()
         self.fear_pred = self.fear.predict()
         self.joy_pred = self.joy.predict()
@@ -49,8 +61,7 @@ class Prediction:
         self.graph()
 
     def graph(self):
-        # TODO clean up limit of graph x axis
-        x = range(1, len(get_song_list_ids('5ugRWc6JSXeDOny8WolH2g')) + 1)
+        x = range(1, len(get_recently_played()) + 1)
         j, f, a, s = map(list, zip(*sorted(zip(self.joy_pred, self.fear_pred, self.anger_pred, self.sadness_pred))))
         fig = plt.figure()
         ax = fig.add_subplot()

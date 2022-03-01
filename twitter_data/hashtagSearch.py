@@ -2,18 +2,17 @@ import re
 from datetime import timedelta
 from string import punctuation
 
-import pandas
 import tweepy
+
+import pandas
 from IPython.core.display import display
 from numpy import int64
-
 import pandas as pd
 
-from classification.classification import LinLogReg, KernelSVC, KNeighborRegressor
 from classification.senti_prediction import Prediction
 from sentiment.lyric_sentiment import get_lyrics_senti
 from sentiment.sentiment_analyser import get_text_senti, COLUMN_HEADINGS
-from spotipy_section.graphPlaylist import label_heatmap, get_artist_song_name
+from spotipy_section.graphPlaylist import label_heatmap, get_song_artist_name
 from twitter_data import innit_tweepy
 
 api = innit_tweepy.get_tweepy_api()
@@ -132,6 +131,7 @@ def get_users_song_lists():
     return all_user_lists
 
 
+# Adds the sentiment label to each song in the dataframe
 def add_song_label(messages):
     global label_df
 
@@ -143,6 +143,7 @@ def add_song_label(messages):
         label_df = label_df.append(pd.Series(0, index=label_df.columns), ignore_index=True)
 
 
+# Gets the averaged sentiment of each song tweet from previous tweets
 def get_before_s_tweets():
     # example_user = all_s_tweets.iloc[0]
 
@@ -199,6 +200,7 @@ def rem_blacklist():
             pass
 
 
+# Creates the dataframe of songs and other data for either a chosen user or if none, a selection of random users
 def create_s_tweet_df(chosen_user):
     global all_s_tweets
     global CHOSEN_USER
@@ -228,6 +230,7 @@ def get_s_tweet(user):
                                   time=tweet.created_at)
 
 
+# Reads in a file to the main all_s_tweets dataframe
 def read_s_tweet_file(file_name):
     global all_s_tweets
     dtypes = {'user_name': 'str', 'text': 'str', 'track_id': 'str', 'tweet_id': 'int64', 'time': 'str'}
@@ -237,11 +240,12 @@ def read_s_tweet_file(file_name):
     all_s_tweets.dropna(subset=["track_id"], inplace=True)
 
 
+# Gets the sentiment analysis on each song
 def get_lyric_sentiment(df):
     lyric_df = pandas.DataFrame()
     for row_index, df_row in df.iterrows():
         trackid = df_row['track_id']
-        song_name, artist_name = get_artist_song_name(trackid)
+        song_name, artist_name = get_song_artist_name(trackid)
         row = get_lyrics_senti(song_name, artist_name)
         try:
             if row.empty:
@@ -256,7 +260,7 @@ def get_lyric_sentiment(df):
     return df_concat
 
 
-# FIXME
+# Produces a 3D interpolation graph for each emotion using 'energy' and 'valence' as axis
 def get_heatmap():
     data_to_graph = all_s_tweets
     data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
@@ -267,12 +271,14 @@ def get_heatmap():
     label_heatmap(data_to_graph)
 
 
+# Classifies the data and uses a predicting model
 def classify_data():
     data_to_graph = all_s_tweets
     # If a row has all values N/A, anger would contain N/A, this code removes any rows with N/A for all values
     data_to_graph = (data_to_graph[data_to_graph['anger'].notna()])
     # Removes rows which show no emotion
-    data_to_graph = data_to_graph.drop(data_to_graph[(data_to_graph.anger == 0) & (data_to_graph.fear == 0) & (data_to_graph.joy == 0) & (data_to_graph.sadness == 0)].index)
+    data_to_graph = data_to_graph.drop(data_to_graph[(data_to_graph.anger == 0) & (data_to_graph.fear == 0) & (
+                data_to_graph.joy == 0) & (data_to_graph.sadness == 0)].index)
     # Gets the user with the most records
     mode_user_name = data_to_graph['user_name'].value_counts().idxmax()
     # Forms array of same (mode) user data
@@ -301,15 +307,8 @@ def classify_data():
     predictor = Prediction(data_to_graph)
     predictor.drive()
 
-    # print('sadness')
-    # knr_joy = KNeighborRegressor(data_to_graph, "sadness")
-    # knr_joy.drive()
 
-    # print('anger')
-    # knr_joy = KNeighborRegressor(data_to_graph, "anger")
-    # knr_joy.drive()
-
-
+# Gets the longest song song list from all users
 def get_max_songlist():
     # gets all users song lists
     all_song_lists = get_users_song_lists()
@@ -317,6 +316,7 @@ def get_max_songlist():
     return max(x for x in all_song_lists)
 
 
+# Trawls twitter for data on either a specific user or a random selection
 def trawl_data(screen_name):
     global all_s_tweets
     global label_df
@@ -331,6 +331,7 @@ def trawl_data(screen_name):
     # get_heatmap()
 
 
+# Get the most common user from all song records
 def get_max_index(max_list):
     # gets all users song lists
     all_song_lists = get_users_song_lists()
@@ -338,22 +339,24 @@ def get_max_index(max_list):
     return all_song_lists.index(max_list)
 
 
+# Loads the data
 def load_data():
     # read_s_tweet_file("data/s_tweets_trial.csv")
     read_s_tweet_file(FILE_NAME)
 
 
+# Driver function
 def _main_():
     global all_s_tweets
     global label_df
 
     # Gets new data from twitter and also saves into csv
-    # trawl_data("kwangyajail")
+    trawl_data("kwangyajail")
     # Displays whole table of all users and corresponding spotify tweets
     # display(all_s_tweets)
 
     # Open csv and put into s_tweetsd
-    read_s_tweet_file(FILE_NAME)
+    # read_s_tweet_file(FILE_NAME)
 
     # Gets the largest list of songs
     # max_list = get_max_songlist()
@@ -362,11 +365,9 @@ def _main_():
     # graph_one_playlist(max_list)
 
     # get_heatmap()
-    classify_data()
-
-    # --Outdated--
-    # Gets all tweets from a user
-    # get_all_users_tweets()
+    print("DONE")
+    # classify_data()
 
 
 _main_()
+# print(clean_text("This is still a valid entry \n Even though \n \n It has new lines"))

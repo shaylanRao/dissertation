@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import re
 import unidecode
 
-from sentiment.sentiment_analyser import get_l_senti
+from sentiment.sentiment_analyser import get_lyr_senti
 
 
 def get_lyrics_senti(song_name, artist_name):
@@ -21,7 +21,7 @@ def get_lyrics_senti(song_name, artist_name):
         if text:
             lyrics += re.sub("[\(\[].*?[\)\]]", "", text)
 
-    return get_l_senti(lyrics)
+    return get_lyr_senti(lyrics)
 
 
 def clean_name(name):

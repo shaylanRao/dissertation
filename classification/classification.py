@@ -1,22 +1,21 @@
 import math
-import seaborn as sns
+
 import numpy as np
-import pandas
 import pandas as pd
+import seaborn as sns
 from IPython.core.display import display
 from matplotlib import pyplot as plt
-from sklearn.ensemble import BaggingRegressor, GradientBoostingRegressor
+from sklearn.decomposition import PCA
+from sklearn.ensemble import BaggingRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
 from sklearn.metrics import confusion_matrix, classification_report, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC, SVR
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeRegressor
 
-from spotipy_section.graphPlaylist import get_all_music_features, ALL_FEATURE_LABELS, view_scatter_graph, \
-    get_song_list_ids
-from sklearn.decomposition import PCA
-from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
+from spotipy_section.graphPlaylist import get_all_music_features
 
 
 class LinLogReg:
@@ -28,11 +27,11 @@ class LinLogReg:
     LOG_THRESHOLD = 0.5
     DATA_PRESERVED = 0.95
 
-    train_lbl = pandas.Series
-    test_lbl = pandas.Series
+    train_lbl = pd.Series
+    test_lbl = pd.Series
     split_pos = 0
-    train_data = pandas.Series
-    test_data = pandas.Series
+    train_data = pd.Series
+    test_data = pd.Series
 
     scalar = None
     pca_model = None
@@ -80,6 +79,7 @@ class LinLogReg:
 
         # and anger to tentative as labels
         self.set_train_test_labels(shuffled_data.iloc[:, 2:9])
+
 
     def set_train_test_data(self, music_data):
         self.split_pos = math.ceil((len(music_data)) * self.TRAIN_DATA_PROPORTION)
@@ -285,10 +285,10 @@ class KNeighborRegressor(LinLogReg):
 
     def knr_bagging(self, k_num, leaf_sz, weight):
         # Initialises KNR using optimal parameters
-        bagged_knr = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
+        tuned_knr = KNeighborsRegressor(n_neighbors=k_num, leaf_size=leaf_sz, weights=weight)
         print("k: ", k_num, " leaf: ", leaf_sz, " weights: ", weight)
         # Uses bagging to improve model
-        bagging_model = BaggingRegressor(bagged_knr, n_estimators=1000)
+        bagging_model = BaggingRegressor(tuned_knr, n_estimators=1000)
         # Fits the bagged model to the training data with labels
         bagging_model.fit(self.train_data, self.train_lbl)
         # Makes predictions on test data using fitted model
@@ -353,7 +353,7 @@ class DecisionTree(KNeighborRegressor):
         # print(dec_tree.score(self.test_data, self.test_lbl))
 
         # if self.EMOTION == "joy":
-            # sns.distplot(test_preds)
+        # sns.distplot(test_preds)
         best_params = self.grid_search(DecisionTreeRegressor(), parameters)
         # print(best_params)
         tuned_dec_tree = DecisionTreeRegressor(max_depth=best_params['max_depth'],
@@ -362,10 +362,13 @@ class DecisionTree(KNeighborRegressor):
                                                min_samples_leaf=best_params['min_samples_leaf'],
                                                min_weight_fraction_leaf=best_params['min_weight_fraction_leaf'],
                                                splitter=best_params['splitter'])
-        tuned_dec_tree = tuned_dec_tree.fit(self.train_data, self.train_lbl)
-        print("tuned dec tree score")
-        print(tuned_dec_tree.score(self.test_data, self.test_lbl))
-        test_preds = tuned_dec_tree.predict(self.test_data)
+
+        bag_tuned_dec_tree = BaggingRegressor(tuned_dec_tree, n_estimators=1000, max_features=5, max_samples=8)
+        bag_tuned_dec_tree.fit(self.train_data, self.train_lbl)
+        print("bagged dec tree score")
+        print(bag_tuned_dec_tree.score(self.test_data, self.test_lbl))
+        test_preds = bag_tuned_dec_tree.predict(self.test_data)
 
         self.evaluate_model(test_preds)
-        return tuned_dec_tree
+
+        return bag_tuned_dec_tree
