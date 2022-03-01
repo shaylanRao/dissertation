@@ -1,0 +1,3 @@
+[submodule "moodify-website"]
+	path = moodify-website
+	url = https://github.com/shaylanRao/moodify-website.git
